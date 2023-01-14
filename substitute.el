@@ -64,7 +64,7 @@ Possible meaningful values for SCOPE are:
 
 - `below' :: from point to the end of the buffer.
 - `above' :: from point to the beginning of the buffer.
-- nil :: across the whole buffer.
+- nil     :: across the whole buffer.
 - non-nil :: limit to the current defun per `narrow-to-defun'."
   (pcase scope
     ('below "from point to the END of the buffer")
