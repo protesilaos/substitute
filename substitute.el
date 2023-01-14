@@ -28,7 +28,7 @@
 ;;
 ;; WORK-IN-PROGRESS.
 ;;
-;; Some Utilities Built to Substitute Things Independent of Their
+;; Some Utilities Built to Substitute Targets Independent of Their
 ;; Utterances, Thoroughly and Easily.
 
 ;;; Code:
