@@ -155,15 +155,15 @@ This is the subroutine of `substitute-target' and related."
   (let (count)
     (save-excursion
       (save-restriction
-        (let ((search 're-search-forward)
+        (let ((search-direction-function 're-search-forward)
               (narrow (lambda () (widen) (goto-char (point-min)))))
           (pcase scope
             ('below (setq narrow (substitute--current-and-below-motion target)))
-            ('above (setq search 're-search-backward
+            ('above (setq search-direction-function 're-search-backward
                           narrow (substitute--current-and-above-motion target)))
             ('defun (setq narrow (substitute--current-defun))))
           (funcall narrow)
-          (while (funcall search target nil t)
+          (while (funcall search-direction-function target nil t)
             (push (match-string-no-properties 0) count)
             (replace-match sub nil t)))))
     (run-hook-with-args 'substitute-post-replace-hook
