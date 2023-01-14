@@ -123,6 +123,32 @@ Pass to it the TARGET and SCOPE arguments."
    target
    scope))
 
+(defun substitute--current-and-below-motion (target)
+  "Position point to match current TARGET and all below."
+  (lambda ()
+    (widen)
+    (cond
+     ((looking-at target)
+      (goto-char (match-beginning 0)))
+     ((save-excursion (looking-back target (beginning-of-line)))
+      (goto-char (match-beginning 0))))))
+
+(defun substitute--current-and-above-motion (target)
+  "Position point to match current TARGET and all above."
+  (lambda ()
+    (widen)
+    (cond
+     ((looking-at target)
+      (goto-char (match-end 0)))
+     ((save-excursion (looking-back target (beginning-of-line)))
+      (goto-char (match-end 0))))))
+
+(defun substitute--current-defun ()
+  "Position point to the after after `narrow-to-defun'."
+  (lambda ()
+    (narrow-to-defun)
+    (goto-char (point-min))))
+
 (defun substitute--operate (target sub &optional scope)
   "Substitute TARGET with SUB in SCOPE.
 This is the subroutine of `substitute-target' and related."
@@ -132,10 +158,10 @@ This is the subroutine of `substitute-target' and related."
         (let ((search 're-search-forward)
               (narrow (lambda () (widen) (goto-char (point-min)))))
           (pcase scope
-            ('below (setq narrow (lambda () (forward-sexp -1) (widen))))
+            ('below (setq narrow (substitute--current-and-below-motion target)))
             ('above (setq search 're-search-backward
-                          narrow (lambda () (forward-sexp 1) (widen))))
-            ('defun (setq narrow (lambda () (narrow-to-defun) (goto-char (point-min))))))
+                          narrow (substitute--current-and-above-motion target)))
+            ('defun (setq narrow (substitute--current-defun))))
           (funcall narrow)
           (while (funcall search target nil t)
             (push (match-string-no-properties 0) count)
