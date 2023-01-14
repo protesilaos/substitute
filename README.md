@@ -22,7 +22,7 @@ Sample configuration:
   (define-key map (kbd "M-# s") #'substitute-target-below-point)
   (define-key map (kbd "M-# r") #'substitute-target-above-point)
   (define-key map (kbd "M-# d") #'substitute-target-in-function)
-  (define-key map (kbd "M-# M-#") #'substitute-target))
+  (define-key map (kbd "M-# b") #'substitute-target-in-buffer))
 ```
 
 + Package name (GNU ELPA): `substitute` (not available yet)

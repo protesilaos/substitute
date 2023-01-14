@@ -185,49 +185,46 @@ Report a `user-error' if no target is found."
    (t (or (format "\\_<%s\\_>" (thing-at-point 'symbol t))
           (user-error "No substitution target at point")))))
 
-;;;###autoload
-(defun substitute-target (target sub &optional narrow)
-  "Replace TARGET with SUB throughout the buffer.
+(defmacro substitute-command (fn doc scope)
+  "Produce substitute command using FN, DOC, and SCOPE."
+  `(defun ,fn (target sub)
+     ,(format
+      "Replace TARGET with SUB %s.
 
-When called interactively, TARGET is the target at point and
-SUB is a string that is provided at the minibuffer
-prompt.
+When called interactively, TARGET is the symbol at point and SUB
+is a string that is provided at the minibuffer prompt.
 
 If the region is active, TARGET is the text within the region's
-boundaries.
-
-With optional NARROW as a prefix argument, limit the substitution
-to the current function by using `narrow-to-defun'."
-  (interactive
-   (let ((target (substitute--target)))
-     (list target
-           (substitute--prompt target current-prefix-arg)
-           current-prefix-arg)))
-  (substitute--operate target sub (when narrow 'defun)))
+boundaries." doc)
+     (interactive
+      (let ((target (substitute--target)))
+        (list target
+              (substitute--prompt target current-prefix-arg))))
+     (substitute--operate target sub ,scope)))
 
 ;;;###autoload
-(defun substitute-target-in-function ()
-  "Replace target at point in the scope of the currenct function.
-This is the same as calling `narrow-to-defun' before
-`substitute-target' OR invoking the latter command with its
-NARROW prefix argument."
-  (interactive)
-  (let ((target (substitute--target)))
-    (substitute--operate target (substitute--prompt target 'defun) 'defun)))
+(substitute-command
+ substitute-target-in-buffer
+ "throughout the buffer"
+ nil)
 
 ;;;###autoload
-(defun substitute-target-below-point ()
-  "Replace target from point to the end of the buffer."
-  (interactive)
-  (let ((target (substitute--target)))
-    (substitute--operate target (substitute--prompt target 'below) 'below)))
+(substitute-command
+ substitute-target-in-function
+ "in the defun (per `narrow-to-defun')"
+ 'defun)
 
 ;;;###autoload
-(defun substitute-target-above-point ()
-  "Replace target from point to the end of the buffer."
-  (interactive)
-  (let ((target (substitute--target)))
-    (substitute--operate target (substitute--prompt target 'above) 'above)))
+(substitute-command
+ substitute-target-below-point
+ "to the end of the buffer"
+ 'below)
+
+;;;###autoload
+(substitute-command
+ substitute-target-above-point
+ "to the beginning of the buffer"
+ 'above)
 
 (defun substitute-report-operation (target sub count scope)
   "Print message of substitution.
