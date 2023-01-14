@@ -100,18 +100,13 @@ and related."
 
 (defun substitute--prompt-with-highlight (target scope)
   "Prompt for string while referencing TARGET and SCOPE.
-Substantiate the interactivity of `substitute-replace-target'."
+Highlight the TARGET's matching occurences per the user option
+`substitute-highlight'."
   (let ((pretty-target (substitute--pretty-target target)))
     (unwind-protect
         (progn
           (highlight-regexp target (substitute--highlight-face))
-          (read-string
-           (format "Replace `%s' %s with: "
-                   (propertize pretty-target 'face 'error)
-                   (substitute--scope scope))
-           nil
-           'substitute--history
-           pretty-target))
+          (substitute--prompt-without-highlight pretty-target scope))
       (unhighlight-regexp target))))
 
 (defun substitute--prompt (target scope)
