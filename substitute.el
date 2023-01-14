@@ -152,13 +152,13 @@ This is the subroutine of `substitute-target' and related."
     (save-excursion
       (save-restriction
         (let ((search-direction-function 're-search-forward)
-              (narrow (lambda () (widen) (goto-char (point-min)))))
+              (scope-function (lambda () (widen) (goto-char (point-min)))))
           (pcase scope
-            ('below (setq narrow (substitute--current-and-below-motion target)))
+            ('below (setq scope-function (substitute--current-and-below-motion target)))
             ('above (setq search-direction-function 're-search-backward
-                          narrow (substitute--current-and-above-motion target)))
-            ('defun (setq narrow (substitute--current-defun))))
-          (funcall narrow)
+                          scope-function (substitute--current-and-above-motion target)))
+            ('defun (setq scope-function (substitute--current-defun))))
+          (funcall scope-function)
           (while (funcall search-direction-function target nil t)
             (push (match-string-no-properties 0) count)
             (replace-match sub nil t)))))
