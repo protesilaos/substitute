@@ -180,7 +180,7 @@ to the current function by using `narrow-to-defun'."
 ;;;###autoload
 (defun substitute-target-in-function ()
   "Replace target at point in the scope of the currenct function.
-This is the same as calling `narrow' before
+This is the same as calling `narrow-to-defun' before
 `substitute-target' OR invoking the latter command with its
 NARROW prefix argument."
   (interactive)
