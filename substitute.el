@@ -220,11 +220,17 @@ boundaries." doc)
  "to the end of the buffer"
  'below)
 
+(defalias 'substitute-target-to-end-of-buffer
+  'substitute-target-below-point)
+
 ;;;###autoload
 (substitute-command
  substitute-target-above-point
  "to the beginning of the buffer"
  'above)
+
+(defalias 'substitute-target-to-beginning-of-buffer
+  'substitute-target-below-point)
 
 (defun substitute-report-operation (target sub count scope)
   "Print message of substitution.
