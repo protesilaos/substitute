@@ -21,7 +21,7 @@ Sample configuration:
 (let ((map global-map))
   (define-key map (kbd "M-# s") #'substitute-target-below-point)
   (define-key map (kbd "M-# r") #'substitute-target-above-point)
-  (define-key map (kbd "M-# d") #'substitute-target-in-function)
+  (define-key map (kbd "M-# d") #'substitute-target-in-defun)
   (define-key map (kbd "M-# b") #'substitute-target-in-buffer))
 ```
 

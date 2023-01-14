@@ -204,7 +204,7 @@ boundaries." doc)
 
 ;;;###autoload
 (substitute-command
- substitute-target-in-function
+ substitute-target-in-defun
  "in the defun (per `narrow-to-defun')"
  'defun)
 
