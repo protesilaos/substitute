@@ -205,7 +205,7 @@ NARROW prefix argument."
   "Print message of substitution.
 Report COUNTth substitutions of TARGET with SUB in SCOPE."
   (message "Substituted `%s' with `%s' %d times %s"
-           (propertize target 'face 'error)
+           (propertize (substitute--pretty-target target) 'face 'error)
            (propertize sub 'face 'success)
            count
            (propertize scope 'face 'warning)))
