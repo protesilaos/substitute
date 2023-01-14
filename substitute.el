@@ -1,0 +1,214 @@
+;;; substitute.el --- Efficiently replace targets in the buffer or context -*- lexical-binding: t -*-
+
+;; Copyright (C) 2023  Free Software Foundation, Inc.
+
+;; Author: Protesilaos Stavrou <info@protesilaos.com>
+;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
+;; URL: https://git.sr.ht/~protesilaos/substitute
+;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
+;; Version: 0.1.0
+;; Package-Requires: ((emacs "27.1"))
+
+;; This file is NOT part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;;
+;; WORK-IN-PROGRESS.
+;;
+;; Some Utilities Built to Substitute Things Independent of Their
+;; Utterances, Thoroughly and Easily.
+
+;;; Code:
+
+(defgroup substitute nil
+  "Efficiently replace targets in the buffer or context."
+  :group 'editing)
+
+(defcustom substitute-highlight t
+  "If non-nil, highlight target during prompt for its substitute.
+
+If nil, do not highlight anything: just pormpt for a substitute.
+
+At any rate, always specify at the minibuffer prompt the target
+of the substitution."
+  :group 'substitute
+  :type 'boolean)
+
+(defcustom substitute-post-replace-hook nil
+  "Special hook to run after a substitution command.
+Every function is called with four arguments: TARGET, SUB, COUNT,
+and SCOPE."
+  :group 'substitute
+  :type 'hook)
+
+(defvar substitute--history '()
+  "Minibuffer history for `substitute-replace-target'.")
+
+(defun substitute--scope (scope)
+  "Return string that describes SCOPE in plain terms.
+
+Possible meaningful values for SCOPE are:
+
+- `below' :: from point to the end of the buffer.
+- `above' :: from point to the beginning of the buffer.
+- nil :: across the whole buffer.
+- non-nil :: limit to the current defun per `narrow-to-defun'."
+  (pcase scope
+    ('below "from point to the END of the buffer")
+    ('above "from point to the BEGINNING of the buffer")
+    ('nil "across the BUFFER")
+    (_ "in the current DEFUN")))
+
+(defun substitute--pretty-target (target)
+  "Remove regexp delimiters from TARGET.
+Use this to produce a more readable version of TARGET for prompts
+and related."
+  (replace-regexp-in-string "\\\\_<\\(?1:.*?\\)\\\\_>" "\\1" target))
+
+(defun substitute--prompt-without-highlight (target scope)
+  "Prompt for string while referencing TARGET and SCOPE.
+Substantiate the interactivity of `substitute-replace-target'."
+  (let ((pretty-target (substitute--pretty-target target)))
+    (read-string
+     (format "Replace `%s' %s with: "
+             (propertize pretty-target 'face 'error)
+             (substitute--scope scope))
+     nil
+     'substitute--history
+     pretty-target)))
+
+(defun substitute--highlight-face ()
+  "Return face to highlight target of substitute."
+  (if-let* ((face 'lazy-highlight)
+            (facep face))
+      face
+    'secondary-selection))
+
+(defun substitute--prompt-with-highlight (target scope)
+  "Prompt for string while referencing TARGET and SCOPE.
+Substantiate the interactivity of `substitute-replace-target'."
+  (let ((pretty-target (substitute--pretty-target target)))
+    (unwind-protect
+        (progn
+          (highlight-regexp target (substitute--highlight-face))
+          (read-string
+           (format "Replace `%s' %s with: "
+                   (propertize pretty-target 'face 'error)
+                   (substitute--scope scope))
+           nil
+           'substitute--history
+           pretty-target))
+      (unhighlight-regexp target))))
+
+(defun substitute--prompt (target scope)
+  "Return appropriate prompt based on `substitute-highlight'.
+Pass to it the TARGET and SCOPE arguments."
+  (funcall
+   (if substitute-highlight
+       'substitute--prompt-with-highlight
+     'substitute--prompt-without-highlight)
+   target
+   scope))
+
+(defun substitute--operate (target sub &optional scope)
+  "Substitute TARGET with SUB in SCOPE.
+This is the subroutine of `substitute-target' and related."
+  (let (count)
+    (save-excursion
+      (save-restriction
+        (let ((search 're-search-forward)
+              (narrow (lambda () (widen) (goto-char (point-min)))))
+          (pcase scope
+            ('below (setq narrow (lambda () (forward-sexp -1) (widen))))
+            ('above (setq search 're-search-backward
+                          narrow (lambda () (forward-sexp 1) (widen))))
+            ('defun (setq narrow (lambda () (narrow-to-defun) (goto-char (point-min))))))
+          (funcall narrow)
+          (while (funcall search target nil t)
+            (push (match-string-no-properties 0) count)
+            (replace-match sub nil t)))))
+    (run-hook-with-args 'substitute-post-replace-hook
+                        target sub (length count)
+                        (substitute--scope scope))))
+
+(defun substitute--target ()
+  "Return target or report an error.
+If the region is active, the target of the substitute is the text
+within the region's boundaries.  Otherwise the target is the
+target at point.
+
+Report a `user-error' if no target is found."
+  (cond
+   ((region-active-p)
+    (buffer-substring-no-properties (region-beginning) (region-end)))
+   (t (or (format "\\_<%s\\_>" (thing-at-point 'symbol t))
+          (user-error "No substitution target at point")))))
+
+;;;###autoload
+(defun substitute-target (target sub &optional narrow)
+  "Replace TARGET with SUB throughout the buffer.
+
+When called interactively, TARGET is the target at point and
+SUB is a string that is provided at the minibuffer
+prompt.
+
+If the region is active, TARGET is the text within the region's
+boundaries.
+
+With optional NARROW as a prefix argument, limit the substitution
+to the current function by using `narrow-to-defun'."
+  (interactive
+   (let ((target (substitute--target)))
+     (list target
+           (substitute--prompt target current-prefix-arg)
+           current-prefix-arg)))
+  (substitute--operate target sub (when narrow 'defun)))
+
+;;;###autoload
+(defun substitute-target-in-function ()
+  "Replace target at point in the scope of the currenct function.
+This is the same as calling `narrow' before
+`substitute-target' OR invoking the latter command with its
+NARROW prefix argument."
+  (interactive)
+  (let ((target (substitute--target)))
+    (substitute--operate target (substitute--prompt target 'defun) 'defun)))
+
+;;;###autoload
+(defun substitute-target-below-point ()
+  "Replace target from point to the end of the buffer."
+  (interactive)
+  (let ((target (substitute--target)))
+    (substitute--operate target (substitute--prompt target 'below) 'below)))
+
+;;;###autoload
+(defun substitute-target-above-point ()
+  "Replace target from point to the end of the buffer."
+  (interactive)
+  (let ((target (substitute--target)))
+    (substitute--operate target (substitute--prompt target 'above) 'above)))
+
+(defun substitute-report-operation (target sub count scope)
+  "Print message of substitution.
+Report COUNTth substitutions of TARGET with SUB in SCOPE."
+  (message "Substituted `%s' with `%s' %d times %s"
+           (propertize target 'face 'error)
+           (propertize sub 'face 'success)
+           count
+           (propertize scope 'face 'warning)))
+
+(provide 'substitute)
+;;; substitute.el ends here
