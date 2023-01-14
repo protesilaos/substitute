@@ -50,7 +50,9 @@ of the substitution."
 (defcustom substitute-post-replace-hook nil
   "Special hook to run after a substitution command.
 Every function is called with four arguments: TARGET, SUB, COUNT,
-and SCOPE."
+and SCOPE.
+
+For a reference function, see `substitute-report-operation'."
   :group 'substitute
   :type 'hook)
 
