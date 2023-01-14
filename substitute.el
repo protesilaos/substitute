@@ -57,7 +57,7 @@ For a reference function, see `substitute-report-operation'."
   :type 'hook)
 
 (defvar substitute--history '()
-  "Minibuffer history for `substitute-replace-target'.")
+  "Minibuffer history for substitution commands.")
 
 (defun substitute--scope (scope)
   "Return string that describes SCOPE in plain terms.
@@ -81,8 +81,7 @@ and related."
   (replace-regexp-in-string "\\\\_<\\(?1:.*?\\)\\\\_>" "\\1" target))
 
 (defun substitute--prompt-without-highlight (target scope)
-  "Prompt for string while referencing TARGET and SCOPE.
-Substantiate the interactivity of `substitute-replace-target'."
+  "Prompt for string while referencing TARGET and SCOPE."
   (let ((pretty-target (substitute--pretty-target target)))
     (read-string
      (format "Replace `%s' %s with: "
