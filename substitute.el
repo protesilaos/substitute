@@ -76,7 +76,7 @@ Possible meaningful values for SCOPE are:
     ('defun "in the current DEFUN")
     (_ "across the BUFFER")))
 
-(defun substitute--pretty-target (target)
+(defun substitute--prettify-target-description (target)
   "Remove regexp delimiters from TARGET.
 Use this to produce a more readable version of TARGET for prompts
 and related."
@@ -91,7 +91,7 @@ and related."
 
 (defun substitute--prompt-without-highlight (target scope)
   "Prompt for string while referencing TARGET and SCOPE."
-  (let ((pretty-target (substitute--pretty-target target)))
+  (let ((pretty-target (substitute--prettify-target-description target)))
     (read-string
      (format "Replace `%s' %s with: "
              (propertize pretty-target 'face 'error)
@@ -104,7 +104,7 @@ and related."
   "Prompt for string while referencing TARGET and SCOPE.
 Highlight the TARGET's matching occurences per the user option
 `substitute-highlight'."
-  (let ((pretty-target (substitute--pretty-target target)))
+  (let ((pretty-target (substitute--prettify-target-description target)))
     (unwind-protect
         (progn
           (highlight-regexp target (substitute--determine-face))
@@ -237,7 +237,7 @@ boundaries." doc)
   "Print message of substitution.
 Report COUNTth substitutions of TARGET with SUB in SCOPE."
   (message "Substituted `%s' with `%s' %d times %s"
-           (propertize (substitute--pretty-target target) 'face 'error)
+           (propertize (substitute--prettify-target-description target) 'face 'error)
            (propertize sub 'face 'success)
            count
            (propertize scope 'face 'warning)))
