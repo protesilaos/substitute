@@ -153,13 +153,12 @@ Pass to it the TARGET and SCOPE arguments."
 
 (defun substitute--setup-scope (target scope)
   "Derive SCOPE for TARGET."
-  (let (scope-fn)
-    (pcase scope
-      ('below (setq scope-fn (substitute--scope-current-and-below target)))
-      ('above (setq scope-fn (substitute--scope-current-and-above target)))
-      ('defun (setq scope-fn (substitute--scope-current-defun)))
-      (_ (setq scope-fn (substitute--scope-top-of-buffer))))
-    (funcall scope-fn)))
+  (funcall
+   (pcase scope
+     ('below (substitute--scope-current-and-below target))
+     ('above (substitute--scope-current-and-above target))
+     ('defun (substitute--scope-current-defun))
+     (_ (substitute--scope-top-of-buffer)))))
 
 (defun substitute--operate (target sub &optional scope)
   "Substitute TARGET with SUB in SCOPE.
