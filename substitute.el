@@ -182,8 +182,10 @@ Report a `user-error' if no target is found."
   (cond
    ((region-active-p)
     (buffer-substring-no-properties (region-beginning) (region-end)))
-   (t (or (format "\\_<%s\\_>" (thing-at-point 'symbol t))
-          (user-error "No substitution target at point")))))
+   (t
+    (if-let ((thing (thing-at-point 'symbol t)))
+        (format "\\_<%s\\_>" thing)
+      (user-error "No substitution target at point")))))
 
 (defmacro substitute-command (fn doc &optional scope)
   "Produce substitute command using FN, DOC, and SCOPE."
