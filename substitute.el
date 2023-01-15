@@ -151,15 +151,15 @@ This is the subroutine of `substitute-target' and related."
   (let (count)
     (save-excursion
       (save-restriction
-        (let ((search-direction-function 're-search-forward)
-              (scope-function (lambda () (widen) (goto-char (point-min)))))
+        (let ((search-fn 're-search-forward)
+              (scope-fn (lambda () (widen) (goto-char (point-min)))))
           (pcase scope
-            ('below (setq scope-function (substitute--current-and-below-motion target)))
-            ('above (setq search-direction-function 're-search-backward
-                          scope-function (substitute--current-and-above-motion target)))
-            ('defun (setq scope-function (substitute--current-defun))))
-          (funcall scope-function)
-          (while (funcall search-direction-function target nil t)
+            ('below (setq scope-fn (substitute--current-and-below-motion target)))
+            ('above (setq search-fn 're-search-backward
+                          scope-fn (substitute--current-and-above-motion target)))
+            ('defun (setq scope-fn (substitute--current-defun))))
+          (funcall scope-fn)
+          (while (funcall search-fn target nil t)
             (push (match-string-no-properties 0) count)
             (replace-match sub nil t)))))
     (run-hook-with-args 'substitute-post-replace-hook
