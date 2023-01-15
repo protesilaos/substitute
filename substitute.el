@@ -119,7 +119,7 @@ Pass to it the TARGET and SCOPE arguments."
    target
    scope))
 
-(defun substitute--current-and-below-motion (target)
+(defun substitute--scope-current-and-below (target)
   "Position point to match current TARGET and all below."
   (lambda ()
     (widen)
@@ -129,7 +129,7 @@ Pass to it the TARGET and SCOPE arguments."
      ((save-excursion (looking-back target (beginning-of-line)))
       (goto-char (match-beginning 0))))))
 
-(defun substitute--current-and-above-motion (target)
+(defun substitute--scope-current-and-above (target)
   "Position point to match current TARGET and all above."
   (lambda ()
     (widen)
@@ -139,11 +139,27 @@ Pass to it the TARGET and SCOPE arguments."
      ((save-excursion (looking-back target (beginning-of-line)))
       (goto-char (match-end 0))))))
 
-(defun substitute--current-defun ()
+(defun substitute--scope-current-defun ()
   "Position point to the top after `narrow-to-defun'."
   (lambda ()
     (narrow-to-defun)
     (goto-char (point-min))))
+
+(defun substitute--scope-top-of-buffer ()
+  "Position point to the top of the buffer."
+  (lambda ()
+    (widen)
+    (goto-char (point-min))))
+
+(defun substitute--setup-scope (target scope)
+  "Derive SCOPE for TARGET."
+  (let (scope-fn)
+    (pcase scope
+      ('below (setq scope-fn (substitute--scope-current-and-below target)))
+      ('above (setq scope-fn (substitute--scope-current-and-above target)))
+      ('defun (setq scope-fn (substitute--scope-current-defun)))
+      (_ (setq scope-fn (substitute--scope-top-of-buffer))))
+    (funcall scope-fn)))
 
 (defun substitute--operate (target sub &optional scope)
   "Substitute TARGET with SUB in SCOPE.
@@ -151,17 +167,13 @@ This is the subroutine of `substitute-target' and related."
   (let (count)
     (save-excursion
       (save-restriction
-        (let ((search-fn 're-search-forward)
-              (scope-fn (lambda () (widen) (goto-char (point-min)))))
-          (pcase scope
-            ('below (setq scope-fn (substitute--current-and-below-motion target)))
-            ('above (setq search-fn 're-search-backward
-                          scope-fn (substitute--current-and-above-motion target)))
-            ('defun (setq scope-fn (substitute--current-defun))))
-          (funcall scope-fn)
-          (while (funcall search-fn target nil t)
-            (push (match-string-no-properties 0) count)
-            (replace-match sub nil t)))))
+        (substitute--setup-scope target scope)
+        (while (funcall (if (eq scope 'above)
+                            're-search-backward
+                          're-search-forward)
+                        target nil t)
+          (push (match-string-no-properties 0) count)
+          (replace-match sub nil t))))
     (run-hook-with-args 'substitute-post-replace-hook
                         target sub (length count)
                         (substitute--scope scope))))
