@@ -192,7 +192,7 @@ Report a `user-error' if no target is found."
   "Produce substitute command using FN, DOC, and SCOPE."
   `(defun ,fn (target sub)
      ,(format
-      "Replace TARGET with SUB %s.
+       "Replace TARGET with SUB %s.
 
 When called interactively, TARGET is the symbol at point and SUB
 is a string that is provided at the minibuffer prompt.
