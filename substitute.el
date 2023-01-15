@@ -121,44 +121,39 @@ Pass to it the TARGET and SCOPE arguments."
 
 (defun substitute--scope-current-and-below (target)
   "Position point to match current TARGET and all below."
-  (lambda ()
-    (widen)
-    (cond
-     ((looking-at target)
-      (goto-char (match-beginning 0)))
-     ((save-excursion (looking-back target (beginning-of-line)))
-      (goto-char (match-beginning 0))))))
+  (widen)
+  (cond
+   ((looking-at target)
+    (goto-char (match-beginning 0)))
+   ((save-excursion (looking-back target (beginning-of-line)))
+    (goto-char (match-beginning 0)))))
 
 (defun substitute--scope-current-and-above (target)
   "Position point to match current TARGET and all above."
-  (lambda ()
-    (widen)
-    (cond
-     ((looking-at target)
-      (goto-char (match-end 0)))
-     ((save-excursion (looking-back target (beginning-of-line)))
-      (goto-char (match-end 0))))))
+  (widen)
+  (cond
+   ((looking-at target)
+    (goto-char (match-end 0)))
+   ((save-excursion (looking-back target (beginning-of-line)))
+    (goto-char (match-end 0)))))
 
 (defun substitute--scope-current-defun ()
   "Position point to the top after `narrow-to-defun'."
-  (lambda ()
-    (narrow-to-defun)
-    (goto-char (point-min))))
+  (narrow-to-defun)
+  (goto-char (point-min)))
 
 (defun substitute--scope-top-of-buffer ()
   "Position point to the top of the buffer."
-  (lambda ()
-    (widen)
-    (goto-char (point-min))))
+  (widen)
+  (goto-char (point-min)))
 
 (defun substitute--setup-scope (target scope)
   "Derive SCOPE for TARGET."
-  (funcall
-   (pcase scope
-     ('below (substitute--scope-current-and-below target))
-     ('above (substitute--scope-current-and-above target))
-     ('defun (substitute--scope-current-defun))
-     (_ (substitute--scope-top-of-buffer)))))
+  (pcase scope
+    ('below (substitute--scope-current-and-below target))
+    ('above (substitute--scope-current-and-above target))
+    ('defun (substitute--scope-current-defun))
+    (_ (substitute--scope-top-of-buffer))))
 
 (defun substitute--operate (target sub &optional scope)
   "Substitute TARGET with SUB in SCOPE.
