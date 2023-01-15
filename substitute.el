@@ -185,7 +185,7 @@ Report a `user-error' if no target is found."
    (t (or (format "\\_<%s\\_>" (thing-at-point 'symbol t))
           (user-error "No substitution target at point")))))
 
-(defmacro substitute-command (fn doc scope)
+(defmacro substitute-command (fn doc &optional scope)
   "Produce substitute command using FN, DOC, and SCOPE."
   `(defun ,fn (target sub)
      ,(format
@@ -199,14 +199,13 @@ boundaries." doc)
      (interactive
       (let ((target (substitute--target)))
         (list target
-              (substitute--prompt target current-prefix-arg))))
+              (substitute--prompt target ,scope))))
      (substitute--operate target sub ,scope)))
 
 ;;;###autoload
 (substitute-command
  substitute-target-in-buffer
- "throughout the buffer"
- nil)
+ "throughout the buffer")
 
 ;;;###autoload
 (substitute-command
