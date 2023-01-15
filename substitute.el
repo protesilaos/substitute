@@ -140,7 +140,7 @@ Pass to it the TARGET and SCOPE arguments."
       (goto-char (match-end 0))))))
 
 (defun substitute--current-defun ()
-  "Position point to the after after `narrow-to-defun'."
+  "Position point to the top after `narrow-to-defun'."
   (lambda ()
     (narrow-to-defun)
     (goto-char (point-min))))
