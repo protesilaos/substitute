@@ -82,6 +82,13 @@ Use this to produce a more readable version of TARGET for prompts
 and related."
   (replace-regexp-in-string "\\\\_<\\(?1:.*?\\)\\\\_>" "\\1" target))
 
+(defun substitute--determine-face ()
+  "Return face to highlight target of substitute."
+  (if-let* ((face 'lazy-highlight)
+            (facep face))
+      face
+    'secondary-selection))
+
 (defun substitute--prompt-without-highlight (target scope)
   "Prompt for string while referencing TARGET and SCOPE."
   (let ((pretty-target (substitute--pretty-target target)))
@@ -93,13 +100,6 @@ and related."
      'substitute--history
      pretty-target)))
 
-(defun substitute--highlight-face ()
-  "Return face to highlight target of substitute."
-  (if-let* ((face 'lazy-highlight)
-            (facep face))
-      face
-    'secondary-selection))
-
 (defun substitute--prompt-with-highlight (target scope)
   "Prompt for string while referencing TARGET and SCOPE.
 Highlight the TARGET's matching occurences per the user option
@@ -107,7 +107,7 @@ Highlight the TARGET's matching occurences per the user option
   (let ((pretty-target (substitute--pretty-target target)))
     (unwind-protect
         (progn
-          (highlight-regexp target (substitute--highlight-face))
+          (highlight-regexp target (substitute--determine-face))
           (substitute--prompt-without-highlight pretty-target scope))
       (unhighlight-regexp target))))
 
