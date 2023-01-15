@@ -172,7 +172,7 @@ This is the subroutine of `substitute-target' and related."
                         target sub (length count)
                         (substitute--scope-description scope))))
 
-(defun substitute--target ()
+(defun substitute--determine-target ()
   "Return target or report an error.
 If the region is active, the target of the substitute is the text
 within the region's boundaries.  Otherwise the target is the
@@ -199,7 +199,7 @@ is a string that is provided at the minibuffer prompt.
 If the region is active, TARGET is the text within the region's
 boundaries." doc)
      (interactive
-      (let ((target (substitute--target)))
+      (let ((target (substitute--determine-target)))
         (list target
               (substitute--prompt target ,scope))))
      (substitute--operate target sub ,scope)))
