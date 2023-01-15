@@ -119,6 +119,8 @@ Pass to it the TARGET and SCOPE arguments."
    target
    scope))
 
+;; FIXME 2023-01-15: There still are cases where "current and
+;; above/below" miss the current target.
 (defun substitute--scope-current-and-below (target)
   "Position point to match current TARGET and all below."
   (widen)
