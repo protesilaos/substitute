@@ -26,7 +26,7 @@
 
 ;;; Commentary:
 ;;
-;; WORK-IN-PROGRESS.
+;; Read: <https://protesilaos.com/codelog/2023-01-14-emacs-substitute-package/>.
 ;;
 ;; Some Utilities Built to Substitute Targets Independent of Their
 ;; Utterances, Thoroughly and Easily.

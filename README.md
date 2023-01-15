@@ -1,6 +1,6 @@
 # Substitute (substitute.el)
 
-⚠️ WORK-IN-PROGRESS ⚠️ Read: <https://protesilaos.com/codelog/2023-01-14-emacs-substitute-package/>.
+Read: <https://protesilaos.com/codelog/2023-01-14-emacs-substitute-package/>.
 
 Efficiently replace targets in the buffer or context.
 
