@@ -33,6 +33,8 @@
 
 ;;; Code:
 
+(require 'thingatpt)
+
 (defgroup substitute nil
   "Efficiently replace targets in the buffer or context."
   :group 'editing)
@@ -119,25 +121,23 @@ Pass to it the TARGET and SCOPE arguments."
    target
    scope))
 
-;; FIXME 2023-01-15: There still are cases where "current and
-;; above/below" miss the current target.
 (defun substitute--scope-current-and-below (target)
-  "Position point to match current TARGET and all below."
+  "Position point to match current TARGET and below."
   (widen)
-  (cond
-   ((looking-at target)
-    (goto-char (match-beginning 0)))
-   ((save-excursion (looking-back target (beginning-of-line)))
-    (goto-char (match-beginning 0)))))
+  (if-let* (((region-active-p))
+            (bounds (region-bounds)))
+      (goto-char (caar bounds))
+    (thing-at-point-looking-at target)
+    (goto-char (match-beginning 0))))
 
 (defun substitute--scope-current-and-above (target)
-  "Position point to match current TARGET and all above."
+  "Position point to match current TARGET and above."
   (widen)
-  (cond
-   ((looking-at target)
-    (goto-char (match-end 0)))
-   ((save-excursion (looking-back target (beginning-of-line)))
-    (goto-char (match-end 0)))))
+  (if-let* (((region-active-p))
+            (bounds (region-bounds)))
+      (goto-char (caadr bounds))
+    (thing-at-point-looking-at target)
+    (goto-char (match-end 0))))
 
 (defun substitute--scope-current-defun ()
   "Position point to the top after `narrow-to-defun'."
