@@ -163,14 +163,12 @@ Pass to it the TARGET and SCOPE arguments."
 (defun substitute--operate (target sub &optional scope)
   "Substitute TARGET with SUB in SCOPE.
 This is the subroutine of `substitute-target' and related."
-  (let (count)
+  (let ((count)
+        (search-fn (if (eq scope 'above) 're-search-backward 're-search-forward)))
     (save-excursion
       (save-restriction
         (substitute--setup-scope target scope)
-        (while (funcall (if (eq scope 'above)
-                            're-search-backward
-                          're-search-forward)
-                        target nil t)
+        (while (funcall search-fn target nil t)
           (push (match-string-no-properties 0) count)
           (replace-match sub nil t))))
     (run-hook-with-args 'substitute-post-replace-hook
