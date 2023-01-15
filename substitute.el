@@ -61,20 +61,20 @@ For a reference function, see `substitute-report-operation'."
 (defvar substitute--history '()
   "Minibuffer history for substitution commands.")
 
-(defun substitute--scope (scope)
+(defun substitute--scope-description (scope)
   "Return string that describes SCOPE in plain terms.
 
 Possible meaningful values for SCOPE are:
 
 - `below' :: from point to the end of the buffer.
 - `above' :: from point to the beginning of the buffer.
-- nil     :: across the whole buffer.
-- non-nil :: limit to the current defun per `narrow-to-defun'."
+- `defun' :: limit to the current defun per `narrow-to-defun'.
+- nil     :: across the whole buffer."
   (pcase scope
     ('below "from point to the END of the buffer")
     ('above "from point to the BEGINNING of the buffer")
-    ('nil "across the BUFFER")
-    (_ "in the current DEFUN")))
+    ('defun "in the current DEFUN")
+    (_ "across the BUFFER")))
 
 (defun substitute--pretty-target (target)
   "Remove regexp delimiters from TARGET.
@@ -88,7 +88,7 @@ and related."
     (read-string
      (format "Replace `%s' %s with: "
              (propertize pretty-target 'face 'error)
-             (substitute--scope scope))
+             (substitute--scope-description scope))
      nil
      'substitute--history
      pretty-target)))
@@ -170,7 +170,7 @@ This is the subroutine of `substitute-target' and related."
           (replace-match sub nil t))))
     (run-hook-with-args 'substitute-post-replace-hook
                         target sub (length count)
-                        (substitute--scope scope))))
+                        (substitute--scope-description scope))))
 
 (defun substitute--target ()
   "Return target or report an error.
