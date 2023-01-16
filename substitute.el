@@ -93,7 +93,7 @@ and related."
   "Prompt for string while referencing TARGET and SCOPE."
   (let ((pretty-target (substitute--prettify-target-description target)))
     (read-string
-     (format "Replace `%s' %s with: "
+     (format "Substitute `%s' %s with: "
              (propertize pretty-target 'face 'error)
              (substitute--scope-description scope))
      nil
@@ -191,7 +191,7 @@ Report a `user-error' if no target is found."
   "Produce substitute command using FN, DOC, and SCOPE."
   `(defun ,fn (target sub)
      ,(format
-       "Replace TARGET with SUB %s.
+       "Substitute TARGET with SUB %s.
 
 When called interactively, TARGET is the symbol at point and SUB
 is a string that is provided at the minibuffer prompt.
