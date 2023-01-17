@@ -256,6 +256,7 @@ Report a `user-error' if no target is found."
         (format "\\_<%s\\_>" thing)
       (user-error "No substitution target at point")))))
 
+;;;###autoload
 (defmacro substitute-command (fn doc &optional scope)
   "Produce substitute command using FN, DOC, and SCOPE."
   `(defun ,fn (target sub)
@@ -273,18 +274,15 @@ boundaries." doc)
               (substitute--prompt target ,scope))))
      (substitute--operate target sub ,scope)))
 
-;;;###autoload
 (substitute-command
  substitute-target-in-buffer
  "throughout the buffer")
 
-;;;###autoload
 (substitute-command
  substitute-target-in-defun
  "in the defun (per `narrow-to-defun')"
  'defun)
 
-;;;###autoload
 (substitute-command
  substitute-target-below-point
  "to the end of the buffer"
@@ -293,7 +291,6 @@ boundaries." doc)
 (defalias 'substitute-target-to-end-of-buffer
   'substitute-target-below-point)
 
-;;;###autoload
 (substitute-command
  substitute-target-above-point
  "to the beginning of the buffer"
