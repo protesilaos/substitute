@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/substitute
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.3
+;; Version: 0.1.4
 ;; Package-Requires: ((emacs "27.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -214,7 +214,7 @@ motion."
   (when-let ((targets substitute--last-matches))
     (save-excursion
       (when (listp buffer-undo-list)
-	(push (point) buffer-undo-list))
+        (push (point) buffer-undo-list))
       (save-restriction
         (mapcar (lambda (target)
                   (let ((ps (substitute--beg-end (nth 1 target) (nth 2 target)))
