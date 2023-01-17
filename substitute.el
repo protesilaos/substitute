@@ -213,6 +213,8 @@ If optional SCOPE is equal to `above', then adjust for a reverse
 motion."
   (when-let ((targets substitute--last-matches))
     (save-excursion
+      (when (listp buffer-undo-list)
+	(push (point) buffer-undo-list))
       (save-restriction
         (mapcar (lambda (target)
                   (let ((ps (substitute--beg-end (nth 1 target) (nth 2 target)))
