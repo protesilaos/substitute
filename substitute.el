@@ -184,6 +184,7 @@ Each entry is a list of the symbol and its buffer positions.")
 (defun substitute--collect-targets (target scope)
   "Store occurrences of TARGET in SCOPE in `substitute--last-matches'."
   (let ((search-fn (if (eq scope 'above) 're-search-backward 're-search-forward)))
+    (setq-local substitute--last-matches nil)
     (save-excursion
       (save-restriction
         (substitute--setup-scope target scope)
