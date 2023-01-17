@@ -59,7 +59,10 @@ For a reference function, see `substitute-report-operation'."
   :type 'hook)
 
 (defface substitute-match
-  `((t :inherit ,(substitute--determine-face)))
+  `((t :inherit ,(if-let* ((face 'lazy-highlight)
+                           (facep face))
+                     face
+                   'secondary-selection)))
   "Face to highlight matches of the given target."
   :group 'substitute)
 
@@ -86,13 +89,6 @@ Possible meaningful values for SCOPE are:
 Use this to produce a more readable version of TARGET for prompts
 and related."
   (replace-regexp-in-string "\\\\_<\\(?1:.*?\\)\\\\_>" "\\1" target))
-
-(defun substitute--determine-face ()
-  "Return face to highlight target of substitute."
-  (if-let* ((face 'lazy-highlight)
-            (facep face))
-      face
-    'secondary-selection))
 
 (defun substitute--remove-highlights ()
   "Remove `substitute-match' overlays."
