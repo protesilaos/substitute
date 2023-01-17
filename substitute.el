@@ -154,7 +154,7 @@ Pass to it the TARGET and SCOPE arguments."
   (widen)
   (if-let* (((region-active-p))
             (bounds (region-bounds)))
-      (goto-char (caadr bounds))
+      (goto-char (cdar bounds))
     (thing-at-point-looking-at target)
     (goto-char (match-end 0))))
 
@@ -211,15 +211,22 @@ Each entry is a list of the symbol and its buffer positions.")
                                              (nth 2 target)))
                 targets)))))
 
-(defun substitute--replace-targets (sub)
-  "Replace `substitute--last-matches' target with SUB."
+(defun substitute--replace-targets (sub &optional scope)
+  "Replace `substitute--last-matches' target with SUB.
+If optional SCOPE is equal to `above', then adjust for a reverse
+motion."
   (when-let ((targets substitute--last-matches))
     (save-excursion
       (save-restriction
         (mapcar (lambda (target)
-                  (let ((ps (substitute--beg-end (nth 1 target) (nth 2 target))))
-                    (goto-char (car ps))
-                    (re-search-forward (car target))
+                  (let ((ps (substitute--beg-end (nth 1 target) (nth 2 target)))
+                        reverse)
+                    (when (eq scope 'above)
+                      (setq reverse t))
+                    (goto-char (if reverse (cadr ps) (car ps)))
+                    (funcall
+                     (if reverse 're-search-backward 're-search-forward)
+                     (car target))
                     (replace-match sub)))
                 targets)))))
 
@@ -228,7 +235,7 @@ Each entry is a list of the symbol and its buffer positions.")
   (let* ((targets (or substitute--last-matches
                       (substitute--collect-targets target scope)))
          (count (length targets)))
-    (substitute--replace-targets sub)
+    (substitute--replace-targets sub scope)
     (setq-local substitute--last-matches nil)
     (run-hook-with-args 'substitute-post-replace-hook
                         target sub count
