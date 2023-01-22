@@ -34,7 +34,8 @@
 ;;; Code:
 
 (require 'thingatpt)
-(require 'subr-x)
+(eval-when-compile (require 'subr-x))
+
 (defgroup substitute nil
   "Efficiently replace targets in the buffer or context."
   :group 'editing)
