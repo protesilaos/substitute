@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/substitute
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.4
+;; Version: 0.1.5
 ;; Package-Requires: ((emacs "27.1"))
 
 ;; This file is NOT part of GNU Emacs.
