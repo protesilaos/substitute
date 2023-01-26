@@ -186,7 +186,7 @@ Each entry is a list of the symbol and its buffer positions.")
       (save-restriction
         (substitute--setup-scope target scope)
         (while (funcall search-fn target nil t)
-          (push (list (match-string-no-properties 0)
+          (push (list (regexp-quote (match-string-no-properties 0))
                       (match-beginning 0)
                       (match-end 0))
                 substitute--last-matches))))
@@ -249,7 +249,7 @@ target at point.
 Report a `user-error' if no target is found."
   (cond
    ((region-active-p)
-    (buffer-substring-no-properties (region-beginning) (region-end)))
+    (regexp-quote (buffer-substring-no-properties (region-beginning) (region-end))))
    (t
     (if-let ((thing (thing-at-point 'symbol t)))
         (format "\\_<%s\\_>" thing)
