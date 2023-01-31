@@ -50,7 +50,12 @@ of the substitution."
   :group 'substitute
   :type 'boolean)
 
-(defcustom substitute-post-replace-hook nil
+(define-obsolete-variable-alias
+  'substitute-post-replace-hook
+  'substitute-post-replace-functions
+  "0.2.0")
+
+(defcustom substitute-post-replace-functions nil
   "Special hook to run after a substitution command.
 Every function is called with four arguments: TARGET, SUB, COUNT,
 and SCOPE.
