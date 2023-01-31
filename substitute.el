@@ -61,6 +61,7 @@ Every function is called with four arguments: TARGET, SUB, COUNT,
 and SCOPE.
 
 For a reference function, see `substitute-report-operation'."
+  :package-version '(substitute . "0.2.0")
   :group 'substitute
   :type 'hook)
 
