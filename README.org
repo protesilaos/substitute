@@ -177,7 +177,7 @@ Everything is in place to set up the package.
 
 ;; If you want a message reporting the matches that changed in the
 ;; given context.  We don't do it by default.
-(add-hook 'substitute-post-replace-hook #'substitute-report-operation)
+(add-hook 'substitute-post-replace-functions #'substitute-report-operation)
 
 ;; We do not bind any keys.  This is just an idea.  The mnemonic is
 ;; that M-# (or M-S-3) is close to M-% (or M-S-5).
