@@ -40,13 +40,14 @@
   "Efficiently replace targets in the buffer or context."
   :group 'editing)
 
-(defcustom substitute-highlight nil
+(defcustom substitute-highlight t
   "If non-nil, highlight target during prompt for its substitute.
 
 If nil, do not highlight anything: just prompt for a substitute.
 
 At any rate, always specify at the minibuffer prompt the target
 of the substitution."
+  :package-version '(substitute . "0.2.0")
   :group 'substitute
   :type 'boolean)
 
