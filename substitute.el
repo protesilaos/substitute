@@ -113,11 +113,11 @@ and related."
   "Prompt for string while referencing TARGET and SCOPE."
   (let ((pretty-target (substitute--prettify-target-description target)))
     (substitute--collect-targets target scope)
-    (read-string
+    (read-from-minibuffer
      (format "Substitute `%s' %s with: "
              (propertize pretty-target 'face 'error)
              (substitute--scope-description scope))
-     nil
+     nil nil nil
      'substitute--history
      pretty-target)))
 
