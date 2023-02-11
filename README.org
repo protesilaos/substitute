@@ -193,7 +193,8 @@ Everything is in place to set up the package.
 (setq substitute-highlight nil)
 
 ;; Set this to t if you want to always treat the letter casing
-;; literally.
+;; literally.  Otherwise each command accepts a `C-u' prefix
+  ;; argument to do this on-demand.
 (setq substitute-fixed-letter-case t)
 
 ;; If you want a message reporting the matches that changed in the
