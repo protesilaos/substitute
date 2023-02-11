@@ -99,6 +99,22 @@ scope are as follows:
 4. ~substitute-target-above-point~: Substitute the target from point
    to the beginning of the buffer (alias ~substitute-target-to-beginning-of-buffer~).
 
+[ The ~substitute-fixed-letter-case~ and the =FIXED-CASE= prefix
+  argument for all commands is part of {{{development-version}}}. ]
+
+#+vindex: substitute-fixed-letter-case
+All of the aforementioned commands accept an optional prefix argument
+(=C-u= with the default key bindings).  This passes the =FIXED-CASE=
+argument, which means that the substitution will not try to preserve
+the letter casing of the target text.  Concretely, targeting =test=
+and =TEST= with a substitute of =test-new= will make both of those
+lower case.  Whereas without the prefix argument the result would be
+=test-new= and =TEST-NEW=.  In many cases this is the desired effect.
+To always have fixed letter casing, set the user option
+~substitute-fixed-letter-case~ to a non-nil value.  Doing so is the
+same as always calling the aforementioned commands with a prefix
+argument.
+
 #+vindex: substitute-post-replace-functions
 #+findex: substitute-report-operation
 Every substitution triggers the ~substitute-post-replace-functions~.
@@ -172,8 +188,13 @@ Everything is in place to set up the package.
 #+begin_src emacs-lisp
 (require 'substitute)
 
-;; If you do not like visual feedback on the matching target.  Default is t.
+;; Set this to nil if you do not like visual feedback on the matching
+;; target.  Default is t.
 (setq substitute-highlight nil)
+
+;; Set this to t if you want to always treat the letter casing
+;; literally.
+(setq substitute-fixed-letter-case t)
 
 ;; If you want a message reporting the matches that changed in the
 ;; given context.  We don't do it by default.
@@ -202,7 +223,7 @@ matters.
 + Contributions to code or the manual :: Ed Tavinor, Kostas Andreadis,
   Wang Chunye.
 
-+ Ideas and/or user feedback :: Tomasz Hołubowicz.
++ Ideas and/or user feedback :: Tomasz Hołubowicz, revrari.
 
 * COPYING
 :PROPERTIES:

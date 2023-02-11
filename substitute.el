@@ -51,6 +51,18 @@ of the substitution."
   :group 'substitute
   :type 'boolean)
 
+(defcustom substitute-fixed-letter-case nil
+  "If non-nil, do not alter the letter case of the substituted text.
+Otherwise try to perform capitalization or upcasing based on the
+target text (per `replace-match').
+
+Instead of setting this user option, users can invoke the
+substitution commands, such as `substitute-target-in-buffer',
+with a universal prefix argument."
+  :package-version '(substitute . "0.2.0")
+  :group 'substitute
+  :type 'boolean)
+
 (define-obsolete-variable-alias
   'substitute-post-replace-hook
   'substitute-post-replace-functions
@@ -215,10 +227,15 @@ Each entry is a list of the symbol and its buffer positions.")
                                              (nth 2 target)))
                 targets)))))
 
-(defun substitute--replace-targets (sub &optional scope)
+(defun substitute--replace-targets (sub &optional scope fixed)
   "Replace `substitute--last-matches' target with SUB.
 If optional SCOPE is equal to `above', then adjust for a reverse
-motion."
+motion.
+
+With optional FIXED as a non-nil value, do not alter the case of
+the substituted text.  Otherwise perform capitalization or
+upcasing based on the target text.  See the documenation of
+`replace-match' for how this works."
   (when-let ((targets substitute--last-matches))
     (save-excursion
       (when (listp buffer-undo-list)
@@ -233,15 +250,17 @@ motion."
                     (funcall
                      (if reverse 're-search-backward 're-search-forward)
                      (car target))
-                    (replace-match sub)))
+                    (replace-match sub (or fixed substitute-fixed-letter-case))))
                 targets)))))
 
-(defun substitute--operate (target sub &optional scope)
-  "Operate on TARGET with SUB in SCOPE."
+(defun substitute--operate (target sub &optional scope fixed)
+  "Operate on TARGET with SUB in SCOPE.
+Optional FIXED does not alter the letter casing of substituted
+text (also see `substitute-fixed-letter-case')."
   (let* ((targets (or substitute--last-matches
                       (substitute--collect-targets target scope)))
          (count (length targets)))
-    (substitute--replace-targets sub scope)
+    (substitute--replace-targets sub scope fixed)
     (setq-local substitute--last-matches nil)
     (run-hook-with-args 'substitute-post-replace-hook
                         target sub count
@@ -264,7 +283,7 @@ Report a `user-error' if no target is found."
 
 (defmacro substitute-define-substitute-command (fn doc &optional scope)
   "Produce substitute command using FN, DOC, and SCOPE."
-  `(defun ,fn (target sub)
+  `(defun ,fn (target sub &optional fixed-case)
      ,(format
        "Substitute TARGET with SUB %s.
 
@@ -272,12 +291,22 @@ When called interactively, TARGET is the symbol at point and SUB
 is a string that is provided at the minibuffer prompt.
 
 If the region is active, TARGET is the text within the region's
-boundaries." doc)
+boundaries.
+
+With optional FIXED-CASE as a prefix argument, do not try to
+preserve the letter casing of the target text: the substitution
+is literal.  Otherwise try to preserve the case (per
+`replace-match').
+
+Instead of the optional FIXED-CASE argument, the user can set the
+option `substitute-fixed-letter-case' to non-nil.  That is the
+same as always calling this command with FIXED-CASE." doc)
      (interactive
       (let ((target (substitute--determine-target)))
         (list target
-              (substitute--prompt target ,scope))))
-     (substitute--operate target sub ,scope)))
+              (substitute--prompt target ,scope)
+              current-prefix-arg)))
+     (substitute--operate target sub ,scope fixed-case)))
 
 ;;;###autoload (autoload 'substitute-target-in-buffer "substitute")
 (substitute-define-substitute-command
