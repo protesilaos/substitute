@@ -20,8 +20,8 @@
 #+texinfo: @insertcopying
 
 This manual, written by Protesilaos Stavrou, describes the
-customization options for the Emacs package called =substitute= (or
-=substitute.el=), and provides every other piece of information
+customization options for the Emacs package called ~substitute~ (or
+~substitute.el~), and provides every other piece of information
 pertinent to it.
 
 The documentation furnished herein corresponds to stable version
@@ -138,7 +138,7 @@ hook is empty and no post-substitution action is performed (e.g. the
 :CUSTOM_ID: h:ab97c462-01cc-408a-adf2-aadd87a22e90
 :END:
 
-The package is available as =substitute=.  Simply do:
+The package is available as ~substitute~.  Simply do:
 
 : M-x package-refresh-contents
 : M-x package-install
@@ -229,6 +229,7 @@ matters.
 * COPYING
 :PROPERTIES:
 :CUSTOM_ID: h:055d634a-cd8a-49e8-86f6-0027325e752c
+:COPYING: t
 :END:
 
 Copyright (C) 2023  Free Software Foundation, Inc.
