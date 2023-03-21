@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/substitute
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.1.6
+;; Version: 0.1.7
 ;; Package-Requires: ((emacs "27.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -149,6 +149,7 @@ Highlight the TARGET's matching occurences per the user option
 (defun substitute--prompt (target scope)
   "Return appropriate prompt based on `substitute-highlight'.
 Pass to it the TARGET and SCOPE arguments."
+  (barf-if-buffer-read-only)
   (funcall
    (if substitute-highlight
        'substitute--prompt-with-highlight

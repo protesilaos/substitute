@@ -224,7 +224,7 @@ matters.
 + Contributions to code or the manual :: Ed Tavinor, Kostas Andreadis,
   Wang Chunye.
 
-+ Ideas and/or user feedback :: Tomasz Hołubowicz, revrari.
++ Ideas and/or user feedback :: Tomasz Hołubowicz, ersi-dnd, revrari.
 
 * COPYING
 :PROPERTIES:
