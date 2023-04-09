@@ -193,7 +193,6 @@ Pass to it the TARGET and SCOPE arguments."
     ('defun (substitute--scope-current-defun))
     (_ (substitute--scope-top-of-buffer))))
 
-
 (defvar-local substitute--last-matches nil
   "Alist of the last matching substitution targets.
 Each entry is a list of the symbol and its buffer positions.")
