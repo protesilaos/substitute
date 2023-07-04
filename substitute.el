@@ -6,7 +6,7 @@
 ;; Maintainer: Protesilaos Stavrou General Issues <~protesilaos/general-issues@lists.sr.ht>
 ;; URL: https://git.sr.ht/~protesilaos/substitute
 ;; Mailing-List: https://lists.sr.ht/~protesilaos/general-issues
-;; Version: 0.2.0
+;; Version: 0.2.1
 ;; Package-Requires: ((emacs "27.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -335,7 +335,7 @@ same as always calling this command with FIXED-CASE." doc)
  'above)
 
 (defalias 'substitute-target-to-beginning-of-buffer
-  'substitute-target-below-point)
+  'substitute-target-above-point)
 
 (defun substitute-report-operation (target sub count scope)
   "Print message of substitution.
