@@ -122,6 +122,25 @@ those arguments are to the discretion of the user.  By default, the
 hook is empty and no post-substitution action is performed (e.g. the
 ~substitute-report-operation~).
 
+#+findex: substitute-prefix-map
+The command ~substitute-prefix-map~ can be assigned to a key to make
+it work as a prefix. This way, all Substitute commands are readily
+available. For example:
+
+#+begin_src emacs-lisp
+(define-key global-map (kbd "C-c s") #'substitute-prefix-map)
+#+end_src
+
+After evaluating that, type =C-c s C-h= to learn about all the key
+bindings. To change those, use something like this:
+
+#+begin_src emacs-lisp
+(define-key substitute-prefix-map (kbd "b") #'substitute-target-in-buffer)
+(define-key substitute-prefix-map (kbd "d") #'substitute-target-in-defun)
+(define-key substitute-prefix-map (kbd "r") #'substitute-target-above-point)
+(define-key substitute-prefix-map (kbd "s") #'substitute-target-below-point)
+#+end_src
+
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: h:4943ebc8-45e5-4352-8d51-9a09efa16b74
@@ -189,20 +208,15 @@ Everything is in place to set up the package.
 
 ;; Set this to t if you want to always treat the letter casing
 ;; literally.  Otherwise each command accepts a `C-u' prefix
-  ;; argument to do this on-demand.
+;; argument to do this on-demand.
 (setq substitute-fixed-letter-case t)
 
 ;; If you want a message reporting the matches that changed in the
 ;; given context.  We don't do it by default.
 (add-hook 'substitute-post-replace-functions #'substitute-report-operation)
 
-;; We do not bind any keys.  This is just an idea.  The mnemonic is
-;; that M-# (or M-S-3) is close to M-% (or M-S-5).
-(let ((map global-map))
-  (define-key map (kbd "M-# s") #'substitute-target-below-point)
-  (define-key map (kbd "M-# r") #'substitute-target-above-point)
-  (define-key map (kbd "M-# d") #'substitute-target-in-defun)
-  (define-key map (kbd "M-# b") #'substitute-target-in-buffer))
+;; Use C-c s as a prefix for all Substitute commands.
+(define-key global-map (kbd "C-c s") #'substitute-prefix-map)
 #+end_src
 
 * Acknowledgements
