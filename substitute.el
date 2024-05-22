@@ -5,7 +5,7 @@
 ;; Author: Protesilaos Stavrou <info@protesilaos.com>
 ;; Maintainer: Protesilaos Stavrou <info@protesilaos.com>
 ;; URL: https://github.com/protesilaos/substitute
-;; Version: 0.3.0
+;; Version: 0.3.1
 ;; Package-Requires: ((emacs "27.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -351,6 +351,7 @@ Meant to be assigned to a prefix key, like this:
 
     (define-key global-map (kbd \"C-c s\") \=#'substitute-prefix-map)")
 
+;;;###autoload (autoload 'substitute-prefix-map "substitute")
 (define-prefix-command 'substitute-prefix-map)
 
 (define-key substitute-prefix-map (kbd "b") #'substitute-target-in-buffer)
