@@ -182,7 +182,7 @@ mkdir manual-packages
 cd manual-packages
 
 # Clone this repo, naming it "substitute"
-git clone https://git.sr.ht/~protesilaos/substitute substitute
+git clone https://github.com/protesilaos/substitute substitute
 #+end_src
 
 Finally, in your =init.el= (or equivalent) evaluate this:
