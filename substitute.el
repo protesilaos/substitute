@@ -218,7 +218,7 @@ Each entry is a list of the symbol and its buffer positions.")
 
 (defun substitute--highlight-targets ()
   "Highlight `substitute--last-matches'."
-  (when-let ((targets substitute--last-matches))
+  (when-let* ((targets substitute--last-matches))
     (save-excursion
       (save-restriction
         (mapcar (lambda (target)
@@ -235,7 +235,7 @@ With optional FIXED as a non-nil value, do not alter the case of
 the substituted text.  Otherwise perform capitalization or
 upcasing based on the target text.  See the documenation of
 `replace-match' for how this works."
-  (when-let ((targets substitute--last-matches))
+  (when-let* ((targets substitute--last-matches))
     (save-excursion
       (when (listp buffer-undo-list)
         (push (point) buffer-undo-list))
@@ -276,7 +276,7 @@ Report a `user-error' if no target is found."
    ((region-active-p)
     (regexp-quote (buffer-substring-no-properties (region-beginning) (region-end))))
    (t
-    (if-let ((thing (thing-at-point 'symbol t)))
+    (if-let* ((thing (thing-at-point 'symbol t)))
         (format "\\_<%s\\_>" thing)
       (user-error "No substitution target at point")))))
 
