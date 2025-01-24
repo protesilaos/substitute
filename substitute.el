@@ -194,7 +194,8 @@ Pass to it the TARGET and SCOPE arguments."
 
 (defvar-local substitute--last-matches nil
   "Alist of the last matching substitution targets.
-Each entry is a list of the symbol and its buffer positions.")
+Each entry is a list of the form (STRING BEG END), where STRING is the
+text to be replaced, while BEG and END are buffer positions.")
 
 (defun substitute--collect-targets (target scope)
   "Store occurrences of TARGET in SCOPE in `substitute--last-matches'."
