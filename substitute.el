@@ -211,12 +211,6 @@ text to be replaced, while BEG and END are buffer positions.")
                 substitute--last-matches))))
     substitute--last-matches))
 
-(defun substitute--beg-end (beg end)
-  "Determine if BEG is smaller than END and return ordered list."
-  (if (< beg end)
-      (list beg end)
-    (list end beg)))
-
 (defun substitute--highlight-targets ()
   "Highlight `substitute--last-matches'."
   (when-let* ((targets substitute--last-matches))
@@ -242,17 +236,16 @@ upcasing based on the target text.  See the documenation of
       (when (listp buffer-undo-list)
         (push (point) buffer-undo-list))
       (save-restriction
-        (mapcar (lambda (target)
-                  (let ((ps (substitute--beg-end (nth 1 target) (nth 2 target)))
-                        reverse)
-                    (when (eq scope 'above)
-                      (setq reverse t))
-                    (goto-char (if reverse (cadr ps) (car ps)))
-                    (funcall
-                     (if reverse 're-search-backward 're-search-forward)
-                     (car target))
-                    (replace-match sub (or fixed substitute-fixed-letter-case))))
-                targets)))))
+        (mapcar
+         (lambda (target)
+           (pcase-let* ((`(,string ,beg ,end) target)
+                        (`(,pos ,fn) (if (eq scope 'above)
+                                         (list (max beg end) 're-search-backward)
+                                       (list (min beg end) 're-search-forward))))
+             (goto-char pos)
+             (funcall fn string)
+             (replace-match sub (or fixed substitute-fixed-letter-case))))
+         targets)))))
 
 (defun substitute--operate (target sub &optional scope fixed)
   "Operate on TARGET with SUB in SCOPE.
