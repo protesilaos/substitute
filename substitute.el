@@ -221,10 +221,11 @@ Each entry is a list of the symbol and its buffer positions.")
   (when-let* ((targets substitute--last-matches))
     (save-excursion
       (save-restriction
-        (mapcar (lambda (target)
-                  (substitute--add-highlight (nth 1 target)
-                                             (nth 2 target)))
-                targets)))))
+        (mapcar
+         (lambda (target)
+           (pcase-let ((`(,_ ,beg ,end) target))
+             (substitute--add-highlight beg end)))
+         targets)))))
 
 (defun substitute--replace-targets (sub &optional scope fixed)
   "Replace `substitute--last-matches' target with SUB.
