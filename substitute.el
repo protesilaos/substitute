@@ -79,7 +79,7 @@ For a reference function, see `substitute-report-operation'."
 
 (defface substitute-match
   `((t :inherit ,(if-let* ((face 'lazy-highlight)
-                           (facep face))
+                           ((facep face)))
                      face
                    'secondary-selection)))
   "Face to highlight matches of the given target."
