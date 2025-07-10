@@ -79,7 +79,7 @@ For a reference function, see `substitute-report-operation'."
 
 (defface substitute-match
   `((t :inherit ,(if-let* ((face 'lazy-highlight)
-                           ((facep face)))
+                           (_ (facep face)))
                      face
                    'secondary-selection)))
   "Face to highlight matches of the given target."
@@ -159,7 +159,7 @@ Pass to it the TARGET and SCOPE arguments."
 (defun substitute--scope-current-and-below (target)
   "Position point to match current TARGET and below."
   (widen)
-  (if-let* (((region-active-p))
+  (if-let* ((_ (region-active-p))
             (bounds (region-bounds)))
       (goto-char (caar bounds))
     (thing-at-point-looking-at target)
@@ -168,7 +168,7 @@ Pass to it the TARGET and SCOPE arguments."
 (defun substitute--scope-current-and-above (target)
   "Position point to match current TARGET and above."
   (widen)
-  (if-let* (((region-active-p))
+  (if-let* ((_ (region-active-p))
             (bounds (region-bounds)))
       (goto-char (cdar bounds))
     (thing-at-point-looking-at target)
