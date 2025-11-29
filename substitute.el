@@ -104,6 +104,7 @@ Possible meaningful values for SCOPE are:
     ('defun-and-below "from point to the END of the current DEFUN")
     ('outline "in the current OUTLINE level")
     ('page "in the current PAGE")
+    ('paragraph "in the current PARAGRAPH")
     (_ "across the BUFFER")))
 
 (defun substitute--prettify-target-description (target)
@@ -246,6 +247,26 @@ text."
   (substitute-narrow-to-regexp 'outline-regexp (point))
   (goto-char (point-min)))
 
+;; NOTE 2025-11-29: I was hoping to use `substitute-narrow-to-regexp'
+;; with a simple regular expression for paragraphs, but then I looked
+;; at `forward-paragraph' and realised that what constitutes a
+;; "paragraph" is not a simple thing.
+(defun substitute--narrow-to-paragraph (position)
+  "Narrow to the paragraph closest to POSITION."
+  (goto-char position)
+  (let ((beg nil)
+        (end nil))
+    (start-of-paragraph-text)
+    (setq beg (point))
+    (end-of-paragraph-text)
+    (setq end (point))
+    (narrow-to-region beg end)))
+
+(defun substitute--scope-current-paragraph ()
+  "Position point to the top of the current paragraph."
+  (substitute--narrow-to-paragraph (point))
+  (goto-char (point-min)))
+
 (defun substitute--setup-scope (target scope)
   "Derive SCOPE for TARGET."
   (pcase scope
@@ -255,6 +276,7 @@ text."
     ('defun-and-below (substitute--scope-current-defun-and-below target))
     ('outline (substitute--scope-current-outline))
     ('page (substitute--scope-current-page))
+    ('paragraph (substitute--scope-current-paragraph))
     (_ (substitute--scope-top-of-buffer))))
 
 (defvar-local substitute--last-matches nil
@@ -396,6 +418,12 @@ same as always calling this command with FIXED-CASE." doc)
  "in the current page"
  'page)
 
+;;;###autoload (autoload 'substitute-target-in-paragraph "substitute")
+(substitute-define-substitute-command
+ substitute-target-in-paragraph
+ "in the current paragraph"
+ 'paragraph)
+
 ;;;###autoload (autoload 'substitute-target-below-point "substitute")
 (substitute-define-substitute-command
  substitute-target-below-point
@@ -436,7 +464,7 @@ Meant to be assigned to a prefix key, like this:
 (define-key substitute-prefix-map (kbd "d") #'substitute-target-in-defun)
 (define-key substitute-prefix-map (kbd "D") #'substitute-target-in-defun-and-below)
 (define-key substitute-prefix-map (kbd "o") #'substitute-target-in-outline)
-;; TODO 2025-11-29: I will also add a `paragraph' scope, which should be bound to p.
+(define-key substitute-prefix-map (kbd "p") #'substitute-target-in-paragraph)
 (define-key substitute-prefix-map (kbd "P") #'substitute-target-in-page)
 (define-key substitute-prefix-map (kbd "r") #'substitute-target-above-point)
 (define-key substitute-prefix-map (kbd "s") #'substitute-target-below-point)

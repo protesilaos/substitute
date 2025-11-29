@@ -198,6 +198,10 @@ active region. The differences in scope are as follows:
    within the boundaries of the current definition only from point
    onwards. [ This is part of {{{development-version}}}. ]
 
+#+findex: substitute-target-in-paragraph
+8. ~substitute-target-in-paragraph~: Substitute the target within the
+   boundaries of the current paragraph. [ Part of {{{development-version}}}. ]
+
 ** User options for the substitution commands
 :PROPERTIES:
 :CUSTOM_ID: h:563f265f-c904-47f5-93c7-3d0e315fca33
