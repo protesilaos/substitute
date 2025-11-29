@@ -101,6 +101,9 @@ Possible meaningful values for SCOPE are:
     ('below "from point to the END of the buffer")
     ('above "from point to the BEGINNING of the buffer")
     ('defun "in the current DEFUN")
+    ('defun-and-below "from point to the END of the current DEFUN")
+    ('outline "in the current OUTLINE level")
+    ('page "in the current PAGE")
     (_ "across the BUFFER")))
 
 (defun substitute--prettify-target-description (target)
@@ -179,9 +182,71 @@ Pass to it the TARGET and SCOPE arguments."
   (narrow-to-defun)
   (goto-char (point-min)))
 
+(defun substitute--scope-current-defun-and-below (target)
+  "Position point to match current TARGET and below only in this defun."
+  (narrow-to-defun)
+  (if-let* ((_ (region-active-p))
+            (bounds (region-bounds)))
+      (goto-char (caar bounds))
+    (thing-at-point-looking-at target)
+    (goto-char (match-beginning 0))))
+
 (defun substitute--scope-top-of-buffer ()
   "Position point to the top of the buffer."
   (widen)
+  (goto-char (point-min)))
+
+(defun substitute--get-bounds (regexp position add-line-prefix)
+  "Get bounds of REGEXP from POSITION.
+With ADD-LINE-PREFIX, prepend ^ to the REGEXP, else take it as-is."
+  (let ((original-position (point))
+        (beg nil)
+        (end nil)
+        (rx (if add-line-prefix
+                (format "^\\(?:%s\\)" regexp)
+              regexp)))
+    (goto-char position)
+    (when (re-search-backward rx nil t)
+      (setq beg (match-beginning 0)))
+    (goto-char (line-end-position))
+    (when (re-search-forward rx nil t)
+      (setq end (match-beginning 0)))
+    (goto-char original-position)
+    (cond
+     ((and beg end)
+      (cons beg end))
+     (beg
+      (cons beg (point-max)))
+     (end
+      (cons (point-min) end)))))
+
+(defun substitute-narrow-to-regexp (thing position add-line-prefix)
+  "Narrow to the THING closest to POSITION.
+THING is the symbol of a variable whose value is a regular expression,
+such as `outline-regexp'.
+
+ADD-LINE-PREFIX prepends ^ to the value of THING, else it takes the
+value as-is."
+  (if-let* ((_ (boundp thing))
+            (regexp (symbol-value thing))
+            (bounds (substitute--get-bounds outline-regexp position add-line-prefix))
+            (beg (car bounds))
+            (end (cdr bounds)))
+      (narrow-to-region beg end)
+    (user-error "There is no match for REGEXP here: `%s'" regexp)))
+
+(defun substitute--scope-current-outline ()
+  "Position point to the top of the current outline per `outline-regexp'.
+In programming modes this might be practically the same as
+`narrow-to-defun'.  In modes like Org or Markdown, it will be the
+current heading and the text below it without subheadings and their
+text."
+  (substitute-narrow-to-regexp 'outline-regexp (point) :add-line-prefix)
+  (goto-char (point-min)))
+
+(defun substitute--scope-current-page ()
+  "Position point to the top of the current page per `page-delimiter'."
+  (substitute-narrow-to-regexp 'outline-regexp (point) :add-line-prefix)
   (goto-char (point-min)))
 
 (defun substitute--setup-scope (target scope)
@@ -190,6 +255,9 @@ Pass to it the TARGET and SCOPE arguments."
     ('below (substitute--scope-current-and-below target))
     ('above (substitute--scope-current-and-above target))
     ('defun (substitute--scope-current-defun))
+    ('defun-and-below (substitute--scope-current-defun-and-below target))
+    ('outline (substitute--scope-current-outline))
+    ('page (substitute--scope-current-page))
     (_ (substitute--scope-top-of-buffer))))
 
 (defvar-local substitute--last-matches nil
@@ -313,6 +381,24 @@ same as always calling this command with FIXED-CASE." doc)
  "in the defun (per `narrow-to-defun')"
  'defun)
 
+;;;###autoload (autoload 'substitute-target-in-defun-and-below "substitute")
+(substitute-define-substitute-command
+ substitute-target-in-defun-and-below
+ "in the defun (per `narrow-to-defun') and going down"
+ 'defun-and-below)
+
+;;;###autoload (autoload 'substitute-target-in-outline "substitute")
+(substitute-define-substitute-command
+ substitute-target-in-outline
+ "in the current outline level"
+ 'outline)
+
+;;;###autoload (autoload 'substitute-target-in-page "substitute")
+(substitute-define-substitute-command
+ substitute-target-in-page
+ "in the current page"
+ 'page)
+
 ;;;###autoload (autoload 'substitute-target-below-point "substitute")
 (substitute-define-substitute-command
  substitute-target-below-point
@@ -351,6 +437,10 @@ Meant to be assigned to a prefix key, like this:
 
 (define-key substitute-prefix-map (kbd "b") #'substitute-target-in-buffer)
 (define-key substitute-prefix-map (kbd "d") #'substitute-target-in-defun)
+(define-key substitute-prefix-map (kbd "D") #'substitute-target-in-defun-and-below)
+(define-key substitute-prefix-map (kbd "o") #'substitute-target-in-outline)
+;; TODO 2025-11-29: I will also add a `paragraph' scope, which should be bound to p.
+(define-key substitute-prefix-map (kbd "P") #'substitute-target-in-page)
 (define-key substitute-prefix-map (kbd "r") #'substitute-target-above-point)
 (define-key substitute-prefix-map (kbd "s") #'substitute-target-below-point)
 
