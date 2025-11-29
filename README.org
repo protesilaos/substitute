@@ -45,102 +45,6 @@ the GNU ELPA machinery automatically generates an Info manual out of it.
 
 #+toc: headlines 8 insert TOC here, with eight headline levels
 
-* Overview
-:PROPERTIES:
-:CUSTOM_ID: h:beae1a59-81ae-41ad-803b-f08caa03732b
-:END:
-
-Substitute is a set of commands that perform text replacement (i)
-throughout the buffer, (ii) limited to the current definition (per
-~narrow-to-defun~), (iii) from point to the end of the buffer, and
-(iv) from point to the beginning of the buffer.
-
-These substitutions are meant to be as quick as possible and, as such,
-differ from the standard ~query-replace~ (which I still use).  The
-provided commands prompt for substitute text and perform the
-substitution outright.
-
-The substitution prompt mentions the target-to-be-substituted.  It is
-possible to use the "future history" at this prompt (by typing ~M-n~
-with the default key bindings for the ~next-history-element~ command).
-This populates the prompt with the text of the target.  As such, if we
-want to operate on =FOO= to make it =FOO-BAR=, we use ~M-n~ and then
-append =-BAR=.
-
-#+vindex: substitute-highlight
-By default, the substitution prompt informs the user about the target
-and highlights matches in the given scope (what the current command
-will substitute).  Highlights can be disabled by setting the user
-option ~substitute-highlight~ to nil.
-
-The substitution commands behave the same way except for their scope
-of application.  What they have in common is how they identify the
-target of the substitution: it is either the symbol at point or the
-text within the boundaries of the active region.  The differences in
-scope are as follows:
-
-#+findex: substitute-target-in-buffer
-1. ~substitute-target-in-buffer~: Substitute the target across the
-   entire buffer.
-
-#+findex: substitute-target-in-defun
-2. ~substitute-target-in-defun~: Substitute the target only in the
-   current definition (per ~narrow-to-defun~).
-
-#+findex: substitute-target-below-point
-#+findex: substitute-target-to-end-of-buffer
-3. ~substitute-target-below-point~: Substitute the target from point
-   to the end of the buffer (alias ~substitute-target-to-end-of-buffer~).
-
-#+findex: substitute-target-above-point
-#+findex:~substitute-target-to-beginning-of-buffer
-4. ~substitute-target-above-point~: Substitute the target from point
-   to the beginning of the buffer (alias ~substitute-target-to-beginning-of-buffer~).
-
-#+vindex: substitute-fixed-letter-case
-All of the aforementioned commands accept an optional prefix argument
-(=C-u= with the default key bindings).  This passes the =FIXED-CASE=
-argument, which means that the substitution will not try to preserve
-the letter casing of the target text.  Concretely, targeting =test=
-and =TEST= with a substitute of =test-new= will make both of those
-lower case.  Whereas without the prefix argument the result would be
-=test-new= and =TEST-NEW=.  In many cases this is the desired effect.
-To always have fixed letter casing, set the user option
-~substitute-fixed-letter-case~ to a non-nil value.  Doing so is the
-same as always calling the aforementioned commands with a prefix
-argument.
-
-#+vindex: substitute-post-replace-functions
-#+findex: substitute-report-operation
-Every substitution triggers the ~substitute-post-replace-functions~.
-This special hook runs any function assigned to it with four
-arguments: =TARGET=, =SUB=, =COUNT=, and =SCOPE=. For a reference
-function, see ~substitute-report-operation~.  This hook can be
-leveraged by the user to produce a report on what just happened by
-printing a message to the echo area.  Custom functions that accept
-those arguments are to the discretion of the user.  By default, the
-hook is empty and no post-substitution action is performed (e.g. the
-~substitute-report-operation~).
-
-#+findex: substitute-prefix-map
-The command ~substitute-prefix-map~ can be assigned to a key to make
-it work as a prefix. This way, all Substitute commands are readily
-available. For example:
-
-#+begin_src emacs-lisp
-(define-key global-map (kbd "C-c s") #'substitute-prefix-map)
-#+end_src
-
-After evaluating that, type =C-c s C-h= to learn about all the key
-bindings. To change those, use something like this:
-
-#+begin_src emacs-lisp
-(define-key substitute-prefix-map (kbd "b") #'substitute-target-in-buffer)
-(define-key substitute-prefix-map (kbd "d") #'substitute-target-in-defun)
-(define-key substitute-prefix-map (kbd "r") #'substitute-target-above-point)
-(define-key substitute-prefix-map (kbd "s") #'substitute-target-below-point)
-#+end_src
-
 * Installation
 :PROPERTIES:
 :CUSTOM_ID: h:4943ebc8-45e5-4352-8d51-9a09efa16b74
@@ -200,23 +104,155 @@ Everything is in place to set up the package.
 :END:
 
 #+begin_src emacs-lisp
-(require 'substitute)
+(use-package substitute
+  :ensure t
+  :config
+  ;; Set this to nil if you do not like visual feedback on the matching
+  ;; target.  Default is t.
+  (setq substitute-highlight nil)
 
-;; Set this to nil if you do not like visual feedback on the matching
-;; target.  Default is t.
-(setq substitute-highlight nil)
+  ;; Set this to t if you want to always treat the letter casing
+  ;; literally.  Otherwise each command accepts a `C-u' prefix
+  ;; argument to do this on-demand.
+  (setq substitute-fixed-letter-case t)
 
-;; Set this to t if you want to always treat the letter casing
-;; literally.  Otherwise each command accepts a `C-u' prefix
-;; argument to do this on-demand.
-(setq substitute-fixed-letter-case t)
+  ;; If you want a message reporting the matches that changed in the
+  ;; given context.  We don't do it by default.
+  (add-hook 'substitute-post-replace-functions #'substitute-report-operation)
 
-;; If you want a message reporting the matches that changed in the
-;; given context.  We don't do it by default.
-(add-hook 'substitute-post-replace-functions #'substitute-report-operation)
+  ;; Use C-c s as a prefix for all Substitute commands.
+  (define-key global-map (kbd "C-c s") #'substitute-prefix-map))
+#+end_src
 
-;; Use C-c s as a prefix for all Substitute commands.
+* Overview
+:PROPERTIES:
+:CUSTOM_ID: h:beae1a59-81ae-41ad-803b-f08caa03732b
+:END:
+
+Substitute is a set of commands that perform text replacement for the
+symbol at point (i) throughout the buffer, (ii) limited to the current
+definition or outline, (iii) from point to the end of the buffer, and
+(iv) from point to the beginning of the buffer. Variations of these
+are also available ([[#h:577fa565-b43a-4e8a-939a-5b08837c1cb1][Substitutions by their scope of application]]).
+[ Variations are available as part of {{{development-version}}}. ]
+
+These substitutions are meant to be as quick as possible and, as such,
+differ from the standard ~query-replace~ (which I still use). The
+provided commands prompt for substitute text and perform the
+substitution outright against the symbol at point.
+
+The substitution prompt mentions the thing-to-be-substituted. It is
+possible to use the "future history" at this prompt (by typing =M-n=
+with the default key bindings for the ~next-history-element~ command).
+This populates the prompt with the text of the target. As such, if we
+want to operate on =FOO= to make it =FOO-BAR=, we use ~M-n~ and then
+append =-BAR=.
+
+** Substitutions by their scope of application
+:PROPERTIES:
+:CUSTOM_ID: h:577fa565-b43a-4e8a-939a-5b08837c1cb1
+:END:
+
+The substitution commands behave the same way except for their scope
+of application ([[#h:563f265f-c904-47f5-93c7-3d0e315fca33][User options for the substitution commands]]). What they
+have in common is how they identify the target of the substitution: it
+is either the symbol at point or the text within the boundaries of the
+active region. The differences in scope are as follows:
+
+#+findex: substitute-target-in-buffer
+1. ~substitute-target-in-buffer~: Substitute the target across the
+   entire buffer.
+
+#+findex: substitute-target-in-defun
+2. ~substitute-target-in-defun~: Substitute the target only in the
+   current definition (per ~narrow-to-defun~).
+
+#+findex: substitute-target-below-point
+#+findex: substitute-target-to-end-of-buffer
+3. ~substitute-target-below-point~: Substitute the target from point
+   to the end of the buffer (alias ~substitute-target-to-end-of-buffer~).
+
+#+findex: substitute-target-above-point
+#+findex:~substitute-target-to-beginning-of-buffer
+4. ~substitute-target-above-point~: Substitute the target from point
+   to the beginning of the buffer (alias ~substitute-target-to-beginning-of-buffer~).
+
+#+findex: substitute-target-in-outline
+5. ~substitute-target-in-outline~: Substitute the target within the
+   boundaries of the current outline level. In Org mode, for example,
+   the current outline is the heading plus its paragraph text but not
+   the subheadings and their text. In programming modes the outline
+   might be the same as the current definition, or could be a longer
+   stretch of text. It depends on the buffer-local value of the
+   variable ~outline-regexp~. [ The ~substitute-target-in-outline~ is
+   part of {{{development-version}}}. ]
+
+#+findex: substitute-target-in-page
+6. ~substitute-target-in-page~: Substitute the target within the
+   boundaries of the current page. A page is demarcated by the
+   buffer-local value of the variable  ~page-delimiter~. [ The command
+   ~substitute-target-in-page~ is part of {{{development-version}}}. ]
+
+#+findex: substitute-target-in-defun-and-below
+7. ~substitute-target-in-defun-and-below~: Substitute the target
+   within the boundaries of the current definition only from point
+   onwards. [ This is part of {{{development-version}}}. ]
+
+** User options for the substitution commands
+:PROPERTIES:
+:CUSTOM_ID: h:563f265f-c904-47f5-93c7-3d0e315fca33
+:END:
+
+These are applicable to all our commands ([[#h:577fa565-b43a-4e8a-939a-5b08837c1cb1][Substitutions by their scope of application]]).
+
+#+vindex: substitute-highlight
+By default, the substitution prompt informs the user about the target
+and highlights matches in the given scope (what the current command
+will substitute).  Highlights can be disabled by setting the user
+option ~substitute-highlight~ to nil.
+
+#+vindex: substitute-fixed-letter-case
+All of the aforementioned commands accept an optional prefix argument
+(=C-u= with the default key bindings).  This passes the =FIXED-CASE=
+argument, which means that the substitution will not try to preserve
+the letter casing of the target text.  Concretely, targeting =test=
+and =TEST= with a substitute of =test-new= will make both of those
+lower case.  Whereas without the prefix argument the result would be
+=test-new= and =TEST-NEW=.  In many cases this is the desired effect.
+To always have fixed letter casing, set the user option
+~substitute-fixed-letter-case~ to a non-nil value.  Doing so is the
+same as always calling the aforementioned commands with a prefix
+argument.
+
+#+vindex: substitute-post-replace-functions
+#+findex: substitute-report-operation
+Every substitution triggers the ~substitute-post-replace-functions~.
+This special hook runs any function assigned to it with four
+arguments: =TARGET=, =SUB=, =COUNT=, and =SCOPE=. For a reference
+function, see ~substitute-report-operation~.  This hook can be
+leveraged by the user to produce a report on what just happened by
+printing a message to the echo area.  Custom functions that accept
+those arguments are to the discretion of the user.  By default, the
+hook is empty and no post-substitution action is performed (e.g. the
+~substitute-report-operation~).
+
+#+findex: substitute-prefix-map
+The command ~substitute-prefix-map~ can be assigned to a key to make
+it work as a prefix. This way, all Substitute commands are readily
+available. For example:
+
+#+begin_src emacs-lisp
 (define-key global-map (kbd "C-c s") #'substitute-prefix-map)
+#+end_src
+
+After evaluating that, type =C-c s C-h= to learn about all the key
+bindings. To change those, use something like this:
+
+#+begin_src emacs-lisp
+(define-key substitute-prefix-map (kbd "b") #'substitute-target-in-buffer)
+(define-key substitute-prefix-map (kbd "d") #'substitute-target-in-defun)
+(define-key substitute-prefix-map (kbd "r") #'substitute-target-above-point)
+(define-key substitute-prefix-map (kbd "s") #'substitute-target-below-point)
 #+end_src
 
 * Acknowledgements
