@@ -4,9 +4,9 @@
 #+language: en
 #+options: ':t toc:nil author:t email:t num:t
 #+startup: content
-#+macro: stable-version 0.3.0
-#+macro: release-date 2024-05-20
-#+macro: development-version 0.4.0-dev
+#+macro: stable-version 0.4.0
+#+macro: release-date 2025-11-29
+#+macro: development-version 0.5.0-dev
 #+export_file_name: substitute.texi
 #+texinfo_filename: substitute.info
 #+texinfo_dir_category: Emacs misc features
@@ -134,7 +134,6 @@ symbol at point (i) throughout the buffer, (ii) limited to the current
 definition or outline, (iii) from point to the end of the buffer, and
 (iv) from point to the beginning of the buffer. Variations of these
 are also available ([[#h:577fa565-b43a-4e8a-939a-5b08837c1cb1][Substitutions by their scope of application]]).
-[ Variations are available as part of {{{development-version}}}. ]
 
 These substitutions are meant to be as quick as possible and, as such,
 differ from the standard ~query-replace~ (which I still use). The
@@ -184,23 +183,21 @@ active region. The differences in scope are as follows:
    the subheadings and their text. In programming modes the outline
    might be the same as the current definition, or could be a longer
    stretch of text. It depends on the buffer-local value of the
-   variable ~outline-regexp~. [ The ~substitute-target-in-outline~ is
-   part of {{{development-version}}}. ]
+   variable ~outline-regexp~.
 
 #+findex: substitute-target-in-page
 6. ~substitute-target-in-page~: Substitute the target within the
    boundaries of the current page. A page is demarcated by the
-   buffer-local value of the variable  ~page-delimiter~. [ The command
-   ~substitute-target-in-page~ is part of {{{development-version}}}. ]
+   buffer-local value of the variable  ~page-delimiter~.
 
 #+findex: substitute-target-in-defun-and-below
 7. ~substitute-target-in-defun-and-below~: Substitute the target
    within the boundaries of the current definition only from point
-   onwards. [ This is part of {{{development-version}}}. ]
+   onwards.
 
 #+findex: substitute-target-in-paragraph
 8. ~substitute-target-in-paragraph~: Substitute the target within the
-   boundaries of the current paragraph. [ Part of {{{development-version}}}. ]
+   boundaries of the current paragraph.
 
 ** User options for the substitution commands
 :PROPERTIES:
