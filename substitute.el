@@ -196,15 +196,15 @@ Pass to it the TARGET and SCOPE arguments."
   (widen)
   (goto-char (point-min)))
 
-(defun substitute--get-bounds (regexp position add-line-prefix)
+(defun substitute--get-bounds (regexp position)
   "Get bounds of REGEXP from POSITION.
-With ADD-LINE-PREFIX, prepend ^ to the REGEXP, else take it as-is."
+If REGEXP does not start with ^, then prepend ^."
   (let ((original-position (point))
         (beg nil)
         (end nil)
-        (rx (if add-line-prefix
-                (format "^\\(?:%s\\)" regexp)
-              regexp)))
+        (rx (if (string-prefix-p "^" regexp)
+                regexp
+              (format "^\\(?:%s\\)" regexp))))
     (goto-char position)
     (when (re-search-backward rx nil t)
       (setq beg (match-beginning 0)))
@@ -220,16 +220,13 @@ With ADD-LINE-PREFIX, prepend ^ to the REGEXP, else take it as-is."
      (end
       (cons (point-min) end)))))
 
-(defun substitute-narrow-to-regexp (thing position add-line-prefix)
+(defun substitute-narrow-to-regexp (thing position)
   "Narrow to the THING closest to POSITION.
 THING is the symbol of a variable whose value is a regular expression,
-such as `outline-regexp'.
-
-ADD-LINE-PREFIX prepends ^ to the value of THING, else it takes the
-value as-is."
+such as `outline-regexp'."
   (if-let* ((_ (boundp thing))
             (regexp (symbol-value thing))
-            (bounds (substitute--get-bounds outline-regexp position add-line-prefix))
+            (bounds (substitute--get-bounds outline-regexp position))
             (beg (car bounds))
             (end (cdr bounds)))
       (narrow-to-region beg end)
@@ -241,12 +238,12 @@ In programming modes this might be practically the same as
 `narrow-to-defun'.  In modes like Org or Markdown, it will be the
 current heading and the text below it without subheadings and their
 text."
-  (substitute-narrow-to-regexp 'outline-regexp (point) :add-line-prefix)
+  (substitute-narrow-to-regexp 'outline-regexp (point))
   (goto-char (point-min)))
 
 (defun substitute--scope-current-page ()
   "Position point to the top of the current page per `page-delimiter'."
-  (substitute-narrow-to-regexp 'outline-regexp (point) :add-line-prefix)
+  (substitute-narrow-to-regexp 'outline-regexp (point))
   (goto-char (point-min)))
 
 (defun substitute--setup-scope (target scope)
