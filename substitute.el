@@ -85,7 +85,7 @@ For a reference function, see `substitute-report-operation'."
   "Face to highlight matches of the given target."
   :group 'substitute)
 
-(defvar substitute--history '()
+(defvar substitute--history nil
   "Minibuffer history for substitution commands.")
 
 (defun substitute--scope-description (scope)
