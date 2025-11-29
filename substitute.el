@@ -96,7 +96,11 @@ Possible meaningful values for SCOPE are:
 - `below' :: from point to the end of the buffer.
 - `above' :: from point to the beginning of the buffer.
 - `defun' :: limit to the current defun per `narrow-to-defun'.
-- nil     :: across the whole buffer."
+- `defun-and-below' :: as above but only operate from point onwards.
+- `outline' :: limit to the current outline level per `outline-regexp'.
+- `page' :: limit to the current page per `page-delimiter'.
+- `paragraph' :: in the current paragraph.
+- any other value :: across the whole buffer."
   (pcase scope
     ('below "from point to the END of the buffer")
     ('above "from point to the BEGINNING of the buffer")
