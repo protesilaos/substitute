@@ -77,6 +77,18 @@ For a reference function, see `substitute-report-operation'."
   :group 'substitute
   :type 'hook)
 
+(defcustom substitute-ignore-narrowing t
+  "When non-nil, ignore any narrowing restrictions.
+In other words, perform the substitution in the scope it would have
+applied to if narrowing was not in effect.  For example, the command
+`substitute-target-in-buffer' will work across the entire buffer.
+
+When nil, respect the narrowing, such that changes only apply to the
+narrowed portion of the buffer."
+  :package-version '(substitute . "0.5.0")
+  :group 'substitute
+  :type 'boolean)
+
 (defface substitute-match
   `((t :inherit ,(if-let* ((face 'lazy-highlight)
                            (_ (facep face)))
@@ -119,7 +131,9 @@ and related."
 
 (defun substitute--remove-highlights ()
   "Remove `substitute-match' overlays."
-  (remove-overlays nil nil 'face 'substitute-match))
+  (save-restriction
+    (widen)
+    (remove-overlays nil nil 'face 'substitute-match)))
 
 (defun substitute--add-highlight (beg end)
   "Add overlay of `substitute-match' between BEG and END positions."
@@ -164,9 +178,14 @@ Pass to it the TARGET and SCOPE arguments."
    target
    scope))
 
+(defun substitute--widen ()
+  "Do `widen' if `substitute-ignore-narrowing' is non-nil."
+  (when substitute-ignore-narrowing
+    (widen)))
+
 (defun substitute--scope-current-and-below (target)
   "Position point to match current TARGET and below."
-  (widen)
+  (substitute--widen)
   (if-let* ((_ (region-active-p))
             (bounds (region-bounds)))
       (goto-char (caar bounds))
@@ -175,7 +194,7 @@ Pass to it the TARGET and SCOPE arguments."
 
 (defun substitute--scope-current-and-above (target)
   "Position point to match current TARGET and above."
-  (widen)
+  (substitute--widen)
   (if-let* ((_ (region-active-p))
             (bounds (region-bounds)))
       (goto-char (cdar bounds))
@@ -198,7 +217,7 @@ Pass to it the TARGET and SCOPE arguments."
 
 (defun substitute--scope-top-of-buffer ()
   "Position point to the top of the buffer."
-  (widen)
+  (substitute--widen)
   (goto-char (point-min)))
 
 (defun substitute--get-bounds (regexp position)
@@ -327,6 +346,7 @@ upcasing based on the target text.  See the documenation of
       (when (listp buffer-undo-list)
         (push (point) buffer-undo-list))
       (save-restriction
+        (substitute--widen)
         (mapcar
          (lambda (target)
            (pcase-let* ((`(,string ,beg ,end) target)

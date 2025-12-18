@@ -224,6 +224,14 @@ To always have fixed letter casing, set the user option
 same as always calling the aforementioned commands with a prefix
 argument.
 
+#+vindex: substitute-ignore-narrowing
+Every substitution is set up to ignore narrowing restrictions by
+default. This is controlled by the user option ~substitute-ignore-narrowing~.
+What this means is that a command such as ~substitute-target-in-buffer~
+will make changes across the buffer even if narrowing is in effect.
+Users who prefer to operate only within the narrowed portion of the
+buffer must set ~substitute-ignore-narrowing~ to ~nil~. [ Part of {{{development-version}}}. ]
+
 #+vindex: substitute-post-replace-functions
 #+findex: substitute-report-operation
 Every substitution triggers the ~substitute-post-replace-functions~.
@@ -269,7 +277,8 @@ matters.
 + Contributions to code or the manual :: Ed Tavinor, Kostas Andreadis,
   Wang Chunye.
 
-+ Ideas and/or user feedback :: Tomasz Hołubowicz, ersi-dnd, revrari.
++ Ideas and/or user feedback :: Tomasz Hołubowicz, ersi-dnd, revrari,
+  zauberen.
 
 * COPYING
 :PROPERTIES:
