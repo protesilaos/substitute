@@ -112,6 +112,7 @@ Possible meaningful values for SCOPE are:
 - `outline' :: limit to the current outline level per `outline-regexp'.
 - `page' :: limit to the current page per `page-delimiter'.
 - `paragraph' :: in the current paragraph.
+- `line' :: on the current line.
 - any other value :: across the whole buffer."
   (pcase scope
     ('below "from point to the END of the buffer")
@@ -121,6 +122,7 @@ Possible meaningful values for SCOPE are:
     ('outline "in the current OUTLINE level")
     ('page "in the current PAGE")
     ('paragraph "in the current PARAGRAPH")
+    ('line "on the current LINE")
     (_ "across the BUFFER")))
 
 (defun substitute--prettify-target-description (target)
@@ -290,6 +292,16 @@ text."
   (substitute--narrow-to-paragraph (point))
   (goto-char (point-min)))
 
+(defun substitute--narrow-to-line (position)
+  "Narrow to the line where POSITION is."
+  (goto-char position)
+  (narrow-to-region (line-beginning-position) (line-end-position)))
+
+(defun substitute--scope-current-line ()
+  "Position point at the beginning of the current line."
+  (substitute--narrow-to-line (point))
+  (goto-char (point-min)))
+
 (defun substitute--setup-scope (target scope)
   "Derive SCOPE for TARGET."
   (pcase scope
@@ -300,6 +312,7 @@ text."
     ('outline (substitute--scope-current-outline))
     ('page (substitute--scope-current-page))
     ('paragraph (substitute--scope-current-paragraph))
+    ('line (substitute--scope-current-line))
     (_ (substitute--scope-top-of-buffer))))
 
 (defvar-local substitute--last-matches nil
@@ -448,6 +461,12 @@ same as always calling this command with FIXED-CASE." doc)
  "in the current paragraph"
  'paragraph)
 
+;;;###autoload (autoload 'substitute-target-on-line "substitute" nil t)
+(substitute-define-substitute-command
+ substitute-target-on-line
+ "on the current line"
+ 'line)
+
 ;;;###autoload (autoload 'substitute-target-below-point "substitute" nil t)
 (substitute-define-substitute-command
  substitute-target-below-point
@@ -491,6 +510,7 @@ Meant to be assigned to a prefix key, like this:
 (define-key substitute-prefix-map (kbd "D") #'substitute-target-in-defun-and-below)
 (define-key substitute-prefix-map (kbd "o") #'substitute-target-in-outline)
 (define-key substitute-prefix-map (kbd "p") #'substitute-target-in-paragraph)
+(define-key substitute-prefix-map (kbd "l") #'substitute-target-on-line)
 (define-key substitute-prefix-map (kbd "P") #'substitute-target-in-page)
 (define-key substitute-prefix-map (kbd "r") #'substitute-target-above-point)
 (define-key substitute-prefix-map (kbd "s") #'substitute-target-below-point)

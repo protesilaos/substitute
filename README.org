@@ -198,6 +198,10 @@ active region. The differences in scope are as follows:
 8. ~substitute-target-in-paragraph~: Substitute the target within the
    boundaries of the current paragraph.
 
+#+findex: substitute-target-on-line
+9. ~substitute-target-on-line~: Substitute the target only on the
+   current line. [ Part of {{{development-version}}}. ]
+
 ** User options for the substitution commands
 :PROPERTIES:
 :CUSTOM_ID: h:563f265f-c904-47f5-93c7-3d0e315fca33
