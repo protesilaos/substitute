@@ -163,16 +163,20 @@ Highlight the TARGET's matching occurences per the user option
       (substitute--remove-highlights)
       (setq-local substitute--last-matches nil))))
 
-(defun substitute--prompt (target scope)
-  "Return appropriate prompt based on `substitute-highlight'.
-Pass to it the TARGET and SCOPE arguments."
-  (barf-if-buffer-read-only)
+(defun substitute--highlight (target scope)
+  "Do what `substitute-highlight' entails for TARGET in SCOPE."
   (funcall
    (if substitute-highlight
        'substitute--prompt-with-highlight
      'substitute--prompt-without-highlight)
    target
    scope))
+
+(defun substitute--prompt (target scope)
+  "Return appropriate prompt based on `substitute-highlight'.
+Pass to it the TARGET and SCOPE arguments."
+  (barf-if-buffer-read-only)
+  (substitute--highlight target scope))
 
 (defun substitute--widen ()
   "Do `widen' if `substitute-ignore-narrowing' is non-nil."
