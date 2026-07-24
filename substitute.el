@@ -112,7 +112,7 @@ Possible meaningful values for SCOPE are:
 - `outline' :: limit to the current outline level per `outline-regexp'.
 - `page' :: limit to the current page per `page-delimiter'.
 - `paragraph' :: in the current paragraph.
-- `line' :: on the current line.
+- `line' :: in the current line.
 - any other value :: across the whole buffer."
   (pcase scope
     ('below "from point to the END of the buffer")
@@ -464,7 +464,7 @@ same as always calling this command with FIXED-CASE." doc)
 ;;;###autoload (autoload 'substitute-target-in-line "substitute" nil t)
 (substitute-define-substitute-command
  substitute-target-in-line
- "on the current line"
+ "in the current line"
  'line)
 
 ;;;###autoload (autoload 'substitute-target-below-point "substitute" nil t)
