@@ -4,9 +4,9 @@
 #+language: en
 #+options: ':t toc:nil author:t email:t num:t
 #+startup: content
-#+macro: stable-version 0.5.0
-#+macro: release-date 2026-01-05
-#+macro: development-version 0.6.0-dev
+#+macro: stable-version 0.6.0
+#+macro: release-date 2026-07-24
+#+macro: development-version 0.7.0-dev
 #+export_file_name: substitute.texi
 #+texinfo_filename: substitute.info
 #+texinfo_dir_category: Emacs misc features
@@ -19,8 +19,8 @@
 
 #+texinfo: @insertcopying
 
-This manual, written by Protesilaos, describes the
-customization options for the Emacs package called ~substitute~ (or
+This manual, written by Protesilaos, describes the customization
+options for the Emacs package called ~substitute~ (or
 ~substitute.el~), and provides every other piece of information
 pertinent to it.
 
@@ -200,7 +200,7 @@ active region. The differences in scope are as follows:
 
 #+findex: substitute-target-in-line
 9. ~substitute-target-in-line~: Substitute the target only on the
-   current line. [ Part of {{{development-version}}}. ]
+   current line.
 
 ** User options for the substitution commands
 :PROPERTIES:
