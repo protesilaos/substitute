@@ -90,9 +90,8 @@ narrowed portion of the buffer."
   :type 'boolean)
 
 (defface substitute-match
-  `((t :inherit ,(if-let* ((face 'lazy-highlight)
-                           (_ (facep face)))
-                     face
+  `((t :inherit ,(if (facep 'lazy-highlight)
+                     'lazy-highlight
                    'secondary-selection)))
   "Face to highlight matches of the given target."
   :group 'substitute)
