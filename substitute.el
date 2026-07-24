@@ -186,9 +186,8 @@ Pass to it the TARGET and SCOPE arguments."
 (defun substitute--scope-current-and-below (target)
   "Position point to match current TARGET and below."
   (substitute--widen)
-  (if-let* ((_ (region-active-p))
-            (bounds (region-bounds)))
-      (goto-char (caar bounds))
+  (if (region-active-p)
+      (goto-char (region-end))
     (thing-at-point-looking-at target)
     (goto-char (match-beginning 0))))
 
