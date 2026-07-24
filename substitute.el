@@ -131,6 +131,11 @@ and related."
     (widen)
     (remove-overlays nil nil 'face 'substitute-match)))
 
+(defvar-local substitute--last-matches nil
+  "Alist of the last matching substitution targets.
+Each entry is a list of the form (STRING BEG END), where STRING is the
+text to be replaced, while BEG and END are buffer positions.")
+
 (defun substitute--add-highlight (beg end)
   "Add overlay of `substitute-match' between BEG and END positions."
   (goto-char beg)
@@ -143,8 +148,9 @@ and related."
   (let ((pretty-target (substitute--prettify-target-description target)))
     (substitute--collect-targets target scope)
     (read-from-minibuffer
-     (format "Substitute `%s' %s with: "
+     (format "Substitute `%s' (%s times) %s with: "
              (propertize pretty-target 'face 'error)
+             (length substitute--last-matches)
              (substitute--scope-description scope))
      nil nil nil
      'substitute--history
@@ -309,11 +315,6 @@ text."
     ('paragraph (substitute--scope-current-paragraph))
     ('line (substitute--scope-current-line))
     (_ (substitute--scope-top-of-buffer))))
-
-(defvar-local substitute--last-matches nil
-  "Alist of the last matching substitution targets.
-Each entry is a list of the form (STRING BEG END), where STRING is the
-text to be replaced, while BEG and END are buffer positions.")
 
 (defun substitute--collect-targets (target scope)
   "Store occurrences of TARGET in SCOPE in `substitute--last-matches'."
