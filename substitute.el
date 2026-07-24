@@ -461,9 +461,9 @@ same as always calling this command with FIXED-CASE." doc)
  "in the current paragraph"
  'paragraph)
 
-;;;###autoload (autoload 'substitute-target-on-line "substitute" nil t)
+;;;###autoload (autoload 'substitute-target-in-line "substitute" nil t)
 (substitute-define-substitute-command
- substitute-target-on-line
+ substitute-target-in-line
  "on the current line"
  'line)
 
@@ -510,7 +510,7 @@ Meant to be assigned to a prefix key, like this:
 (define-key substitute-prefix-map (kbd "D") #'substitute-target-in-defun-and-below)
 (define-key substitute-prefix-map (kbd "o") #'substitute-target-in-outline)
 (define-key substitute-prefix-map (kbd "p") #'substitute-target-in-paragraph)
-(define-key substitute-prefix-map (kbd "l") #'substitute-target-on-line)
+(define-key substitute-prefix-map (kbd "l") #'substitute-target-in-line)
 (define-key substitute-prefix-map (kbd "P") #'substitute-target-in-page)
 (define-key substitute-prefix-map (kbd "r") #'substitute-target-above-point)
 (define-key substitute-prefix-map (kbd "s") #'substitute-target-below-point)
