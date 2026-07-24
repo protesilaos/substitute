@@ -143,13 +143,18 @@ text to be replaced, while BEG and END are buffer positions.")
     (overlay-put highlight 'priority 100)
     (overlay-put highlight 'face 'substitute-match)))
 
+(defface substitute-prompt-target-highlight '((t :inherit error))
+  "Face to highlight the substitute target in the minibuffer prompt."
+  :package-version '(substitute . "0.6.0")
+  :group 'substitute)
+
 (defun substitute--prompt-without-highlight (target scope)
   "Prompt for string while referencing TARGET and SCOPE."
   (let ((pretty-target (substitute--prettify-target-description target)))
     (substitute--collect-targets target scope)
     (read-from-minibuffer
      (format "Substitute `%s' (%s times) %s with: "
-             (propertize pretty-target 'face 'error)
+             (propertize pretty-target 'face 'substitute-prompt-target-highlight)
              (length substitute--last-matches)
              (substitute--scope-description scope))
      nil nil nil
