@@ -230,8 +230,9 @@ Pass to it the TARGET and SCOPE arguments."
 (defun substitute--scope-current-defun-and-below (target)
   "Position point to match current TARGET and below only in this defun."
   (narrow-to-defun)
-  (if (region-active-p)
-      (goto-char (region-end))
+  (if-let* ((_ (region-active-p))
+            (bounds (region-bounds)))
+      (goto-char (caar bounds))
     (thing-at-point-looking-at target)
     (goto-char (match-beginning 0))))
 
