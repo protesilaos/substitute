@@ -39,6 +39,17 @@
   "Efficiently replace targets in the buffer or context."
   :group 'editing)
 
+(defcustom substitute-insert-target-into-minibuffer nil
+  "If non-nil, put the target as the initial text of the minibuffer.
+This means that it can be a bit faster to add a prefix or suffix to it.
+
+If nil, the target is the default minibuffer value, which can be added
+to the minibuffer for further edits with `next-history-element' (this is
+standard behaviour for every prompt that has a default value)."
+  :package-version '(substitute . "0.7.0")
+  :group 'substitute
+  :type 'boolean)
+
 (defcustom substitute-highlight t
   "If non-nil, highlight target during prompt for its substitute.
 
@@ -157,9 +168,10 @@ text to be replaced, while BEG and END are buffer positions.")
              (propertize pretty-target 'face 'substitute-prompt-target-highlight)
              (length substitute--last-matches)
              (substitute--scope-description scope))
-     nil nil nil
-     'substitute--history
-     pretty-target)))
+     (if substitute-insert-target-into-minibuffer
+         target
+       nil)
+     nil nil 'substitute--history pretty-target)))
 
 (defun substitute--prompt-with-highlight (target scope)
   "Prompt for string while referencing TARGET and SCOPE.

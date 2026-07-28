@@ -207,6 +207,18 @@ active region. The differences in scope are as follows:
 
 These are applicable to all our commands ([[#h:577fa565-b43a-4e8a-939a-5b08837c1cb1][Substitutions by their scope of application]]).
 
+#+vindex: substitute-insert-target-into-minibuffer
+The user option ~substitute-insert-target-into-minibuffer~ controls
+whether the target of a given substitution is added as the initial
+text of the minibuffer or not. When the value is non-~nil~, then the
+target becomes the initial text. This makes it a bit faster to add a
+prefix or suffix to it. Otherwise, if ~nil~ then the target remains as
+the default minibuffer value, which can be inserted into the
+minibuffer with ~next-history-element~ (=M-n= by default) and then
+edited further. It is standard for Emacs to have a default minibuffer
+value that is then accessed with ~next-history-element~. [ The user
+option ~substitute-insert-target-into-minibuffer~ is part of {{{development-version}}}. ]
+
 #+vindex: substitute-highlight
 By default, the substitution prompt informs the user about the target
 and highlights matches in the given scope (what the current command
@@ -280,7 +292,7 @@ matters.
   Morgan Willcock, Wang Chunye.
 
 + Ideas and/or user feedback :: Spike-Leung, Tomasz Hołubowicz,
-  ersi-dnd, revrari, zauberen.
+  ersi-dnd, ezchi, revrari, zauberen.
 
 * COPYING
 :PROPERTIES:
